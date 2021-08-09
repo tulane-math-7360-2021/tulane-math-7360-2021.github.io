@@ -5,11 +5,12 @@ title: Math 7360
 
 ## Course Description
 
-This course provides an applied approach to the statistical analysis of datasets using the R software package.
+Math 7360 - Data Analysis provides an applied approach to the statistical analysis of datasets using the R software package.
 
 ## Time and Location
 
 Lectures: Mon/Wed/Fri, 11:00am - 11:50am Gibson Hall 325 with zoom link
+
 ## Instructor
 
 [Dr. Xiang Ji](https://sse.tulane.edu/math/faculty/ji)<br>
