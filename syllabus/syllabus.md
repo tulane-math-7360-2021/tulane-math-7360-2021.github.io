@@ -25,15 +25,15 @@ Proficiency with data analysis in R
 
 ### Lecture and Practicals
 
-Mon 11:00am - 11:50am @ Gibson Hall 325 and Zoom link <TBD>\
-Wed 11:00am - 11:50am @ Gibson Hall 325 and Zoom link <TBD>\
+Mon 11:00am - 11:50am @ Gibson Hall 325 and Zoom link <br>
+Wed 11:00am - 11:50am @ Gibson Hall 325 and Zoom link <br>
 Fri 11:00am - 11:50am @ Zoom link <TBD>
 
 ### Instructor
 
-[Xiang Ji](https://sse.tulane.edu/math/faculty/ji)\
-Office: TBD due to COVID\
-Email: <xji4@tulane.edu>\
+[Xiang Ji](https://sse.tulane.edu/math/faculty/ji)<br>
+Office: TBD due to COVID<br>
+Email: <xji4@tulane.edu><br>
 Office hours: TBD with zoom link <TBD>, or by appointment.
 
 ### Course Webpage

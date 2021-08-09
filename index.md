@@ -12,9 +12,9 @@ This course provides an applied approach to the statistical analysis of datasets
 Lectures: Mon/Wed/Fri, 11:00am - 11:50am Gibson Hall 325 with zoom link
 ## Instructor
 
-[Dr. Xiang Ji](https://sse.tulane.edu/math/faculty/ji)\
-Office: N.A. due to COVID\
-Email: <xji4@tulane.edu>\
+[Dr. Xiang Ji](https://sse.tulane.edu/math/faculty/ji)<br>
+Office: N.A. due to COVID<br>
+Email: <xji4@tulane.edu><br>
 Office hours: TBD with zoom link, or by appointment.
 
 
