@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title> Xiang Ji {% if page.title %} | {{ page.title }} {% endif %} </title>
+
+    <link rel="stylesheet" href="{{ site.url }}/stylesheets/styles.css">
+    <link rel="stylesheet" href="{{ site.url }}/stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+             m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+             })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-42646483-1', 'xji3.github.io');
+            ga('send', 'pageview');
+        </script>
+
+		<script type="text/x-mathjax-config">
+			MathJax.Hub.Config({
+			tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+			});
+		</script>
+    <script type="text/javascript"
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+		</script>
+
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>{{ page.title }}</h1>
+        <p></p>
+        <p class="view"><a href="https://tulane-math-7260-2021.github.io/index.html">home</a></p>
+		<p class="view"><a href="https://tulane-math-7260-2021.github.io/syllabus/syllabus.html">syllabus</a></p>
+		<p class="view"><a href="https://tulane-math-7260-2021.github.io/schedule/schedule.html">schedule</a></p>
+		<p class="view"><a href="https://tulane-math-7260-2021.github.io/announcement.html">announcements</a></p>
+      </header>
+      <section>
+<h1>{{ page.title }} <small>{{ page.date || date_to_string }}</small></h1>
+<hr/>
+
+<div id="post" role="main">
+  {{ content }}
+</div>
+
+<hr/>
+
+<div id="hashover"></div>
+<script type="text/javascript" src="{{ site.url }}/hashover/comments.php"></script>
+<noscript>You must have JavaScript enabled to use the comments.</noscript>
+
+  </body>
+</html>

@@ -1,0 +1,20 @@
+---
+layout: course
+---
+
+<h1>{{ page.title }} <small>{{ page.date || date_to_string }}</small></h1>
+<hr/>
+
+<div id="post" role="main">
+  {{ content }}
+</div>
+
+<hr/>
+
+<h2>Comments</h2>
+
+<div id="hashover"></div>
+<script type="text/javascript" src="{{ site.url }}/hashover/comments.php"></script>
+<noscript>You must have JavaScript enabled to use the comments.</noscript>
+
+
