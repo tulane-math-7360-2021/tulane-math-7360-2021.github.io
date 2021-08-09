@@ -44,13 +44,13 @@ Office hours: TBD with zoom link <TBD>, or by appointment.
 
 There are no required books for this course.  Below is a list of useful resources if you are interested:
 
-1. Reproducible Research with R and RStudio by Christopher Gandrud: Amazon (Links to an external site.), GitHub repo (Links to an external site.).
-2. Happy Git with R (Links to an external site.) by Jenny Bryan.
-3. R Markdown: The Definitive Guide (Links to an external site.) by Yihui Xie, J.J. Allaire, and Garrett Grolemund.
-4. R for Data Science (Links to an external site.) by Hadley Wickham and Garrett Grolemund.
-5. Advanced R (Links to an external site.) by Hadley Wickham.
-6. R Packages (Links to an external site.) by Hadley Wickham.
-7. Rcpp For Everyone (Links to an external site.) by Masaki E. Tsuda.
+1. Reproducible Research with R and RStudio by Christopher Gandrud: [Amazon](https://www.amazon.com/Reproducible-Research-Studio-Second-Chapman/dp/1498715370/ref=dp_ob_title_bk), [GitHub repo](https://github.com/christophergandrud/Rep-Res-Book).
+2. [Happy Git with R](https://happygitwithr.com/) by Jenny Bryan.
+3. [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/) by Yihui Xie, J.J. Allaire, and Garrett Grolemund.
+4. [R for Data Science](https://r4ds.had.co.nz/) by Hadley Wickham and Garrett Grolemund.
+5. [Advanced R](http://adv-r.had.co.nz/) by Hadley Wickham.
+6. [R Packages](http://r-pkgs.had.co.nz/) by Hadley Wickham.
+7. [Rcpp For Everyone](https://teuder.github.io/rcpp4everyone_en/) by Masaki E. Tsuda.
 
 ### ADA/Accessibility Statement
 
