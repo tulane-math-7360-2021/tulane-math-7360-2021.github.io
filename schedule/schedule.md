@@ -1,6 +1,6 @@
 ---
 layout: course
-title: Math 6040/7260
+title: 'Math 7360 <br> Data Analysis'
 ---
 
 ## Course Schedule
