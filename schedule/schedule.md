@@ -26,3 +26,8 @@ Topics:
 | Monday | Wednesday | Friday | HW |
 |:-----------|:-----------|:------------|:---|
 | | | | |
+| | | **09/06** Labor Day Holiday | |
+| | | **10/08** Fall Break | |
+| **11/22** Thanksgiving Holiday |  **11/24** Thanksgiving Holiday |  **11/26** Thanksgiving Holiday | |
+
+
