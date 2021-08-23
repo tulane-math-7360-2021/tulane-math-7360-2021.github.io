@@ -159,7 +159,40 @@ Additions:
   - Discussions.  This is the place to put in almost whatever you want to share.  Some difficulties you met in the analysis, what you learned from the analysis, some future directions.
 
 
-## Comments from course evaluations of 2020
+## Comments from 2020 course evaluations 
+
+From "Additional comments about your experience in this course":
+
+- I learned more from going through the material in the labs than in the actual lectures.
+I think that maybe smaller homework assignments more frequently would have been more effective than three huge assignments.
+
+- I thought the course was well organized.
+The notes were easy to access for later reference which was really helpful.
+I think the only thing that could be improved upon is spending a little less time on learning R and spending more time discussing the theory behind Data Analysis.
+Some of the concepts addressed at the end felt rushed and they were the concepts with which I wanted to spend more time.
+
+- Awesome! Professor Ji is very nice. He answered all my confusions. He always explain things clear enough for us to comprehend.
+
+- Dr. Ji is very knowledgeable and goes out of his way to be available as a resource for students needing help with the course or outside R/research/data questions.
+He made the structure of the course very flexible without sacrificing rigor, which I think everyone really appreciated during this stressful semester.
+I had experience in statistics/R going in, but have improved so much and learned so many new packages and strategies thanks to this course.
+I especially benefitted from the homework assignments, which provided practice with skills that I have been able to immediately apply to my research.
+
+From "Comment on the strongest aspects of this course":
+
+- I liked that this class had a lab component. The labs were helpful in making sure that I was understanding the material.
+
+- I received a lot of help from Professor Xiang, who was always was ready to answer my questions in class or through email.
+
+  - Well, Xiang is my first name...
+  
+- Dr. Ji was by far the best part of the course. He was extremely helpful and prompt with responses to questions. He wanted us to do well in the course.
+
+- Useful in learning R
+
+- This course started from the very basics and covered a lot of information quickly, but was extremely useful and approachable for students coming from different departments with different levels of previous experience.
+I really appreciated that the course was tailored towards providing a brief overview of many relevant topics and developing practical skills, rather than memorizing formulas or taking long comprehensive exams.
+I would highly recommend taking this course with Dr. Ji to anyone who uses R or wants to start learning.
 
 ------------------------------------------------------------------------
 
