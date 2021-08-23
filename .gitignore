@@ -5,3 +5,6 @@ _site/
 
 # mac related
 *.DS_Store
+
+# R related
+*.Rhistory
