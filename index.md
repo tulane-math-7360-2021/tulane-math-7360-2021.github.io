@@ -9,14 +9,16 @@ Math 7360 - Data Analysis provides an applied approach to the statistical analys
 
 ## Time and Location
 
-Lectures: Mon/Wed/Fri, 11:00am - 11:50am Gibson Hall 325 with zoom link
+Lectures: Mon/Wed, 11:00am - 11:50am Gibson Hall 325 with zoom link
+<https://tulane.zoom.us/j/94892763737>
+Labs: Fri, self-pace
 
 ## Instructor
 
 [Dr. Xiang Ji](https://sse.tulane.edu/math/faculty/ji)<br>
 Office: N.A. due to COVID<br>
 Email: <xji4@tulane.edu><br>
-Office hours: TBD with zoom link, or by appointment.
+Office hours: zoom link <https://tulane.zoom.us/j/93405669876>, or by appointment.
 
 
 ## Acknowledgement
