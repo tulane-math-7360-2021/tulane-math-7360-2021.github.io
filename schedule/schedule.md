@@ -25,7 +25,7 @@ Topics:
 
 | Monday | Wednesday | Friday | HW |
 |:-----------|:-----------|:------------|:---|
-| **08/23** intro [[Rmd](../lectures/01-intro/intro.Rmd)][[HTML](../lectures/01-intro/intro.html)] <br> markdown [[Rmd](../lectures/02-Markdown/Markdown.Rmd)][[HTML](../lectures/02-Markdown/Markdown.html)] | | | |
+| **08/23** intro [[Rmd](../lectures/01-intro/intro.Rmd)][[HTML](../lectures/01-intro/intro.html)] <br> markdown [[Rmd](../lectures/02-Markdown/Markdown.Rmd)][[HTML](../lectures/02-Markdown/Markdown.html)] | **08/25** R [[Rmd](../lectures/03-R/R.Rmd)][[HTML](../lectures/03-R/R.html)] | | |
 | | | **09/06** Labor Day Holiday | |
 | | | **10/08** Fall Break | |
 | **11/22** Thanksgiving Holiday |  **11/24** Thanksgiving Holiday |  **11/26** Thanksgiving Holiday | |
