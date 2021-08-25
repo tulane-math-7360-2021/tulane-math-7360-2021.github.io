@@ -143,9 +143,9 @@ More about computer languages
 
 - To improve efficiency of interpreted languages such as R code, avoid loops as much as possible.  Aka, vectorize code.
 
-- For some tasks where looping is necessary (cannot vectorize code), consider conding in C/C++ or Fortran.  It is convenient to incorporate compiled code into R.
+- For some tasks where looping is necessary (cannot vectorize code), consider coding in C/C++ or Fortran.  It is convenient to incorporate compiled code into R.
 
-- To be versatile in dealing with big data, master at least on language in each category.
+- To be versatile in dealing with big data, master at least one language in each category.
 
 - Don't reinvent wheels.  Make good use of libraries BLAS, LAPACK, Boost, Scipy, Numpy, ...
 
