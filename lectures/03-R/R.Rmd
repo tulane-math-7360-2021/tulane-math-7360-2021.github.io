@@ -16,7 +16,7 @@ csl: ../apa.csl
 
   - <https://tulane.zoom.us/j/94892763737?pwd=VTlmMStLd3hUeUhEY0UxdUZJVnk3UT09>
 
-- Introduce yourself on Canvas [Discussion](https://tulane.zoom.us/j/94892763737?pwd=VTlmMStLd3hUeUhEY0UxdUZJVnk3UT09)
+- Introduce yourself on Canvas [Discussion](https://tulane.instructure.com/courses/2238421/discussion_topics/13241432?module_item_id=30871904)
 
 - Friday still has Lab session (but short)
 
