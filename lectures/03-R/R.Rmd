@@ -293,7 +293,7 @@ R commands on vectors
 | min(), max() | min and max values of a vector|
 |length() | length of a vector |
 |summary() | returns the min, Q1, median, mean, Q3, and max values of a vector |
-<!-- | sample(x, size, replace = FALSE, prob = NULL) | takes a random sample from a vector with or without replacement| -->
+| sample(x, size, replace = FALSE, prob = NULL) | takes a random sample from a vector with or without replacement|
 
 **Exercise**
 Write a command to generate a random permutation of the numbers between 1 and 5 and save it to an object.
