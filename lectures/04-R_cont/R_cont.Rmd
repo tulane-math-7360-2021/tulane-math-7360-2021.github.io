@@ -10,7 +10,7 @@ subtitle: MATH-7360 Data Analysis
 csl: ../apa.csl
 ---
 
-## Announcement
+### Announcement
 
 - Lectures will be online with zoom recordings
 
@@ -25,8 +25,6 @@ csl: ../apa.csl
   - learn from the past: start early
 
 - Project description (one page) due in two weeks on Sept. 24, 2021
-
-## More Basics
 
 ### First functions to learn
 
