@@ -24,6 +24,8 @@ csl: ../apa.csl
 
   - learn from the past: start early
 
+- Project description (one page) due in two weeks on Sept. 24, 2021
+
 ## More Basics
 
 ### First functions to learn
@@ -247,83 +249,4 @@ DoBadThing <- function() {
   return(result)
 }
 # DoBadThing()
-```
-
--------------------------------------------------------
-
-## Data Structure
-
-Read [Data structures](http://adv-r.had.co.nz/Data-structures.html) section from Advanced R by Hadley Wickham.
-
-### R's data structures
-
-|      | Homogeneous | Heterogeneous |
-| ---- | ----------- | ------------- |
-| 1d   | Atomic vector | List |
-| 2d   | Matrix      | Data frame |
-| nd   | Array       |            |
-
- - _Homogeneous_: all contents must be of the same type
- 
- - _Heterogeneous_: the contents can be of different types
-
-
-### Vectors
-
- - The basic data structure in R.
- 
- - Two flavors: _atomic vectors_ and _lists_
- 
- - Three common properties:
- 
-   - Type, `typeof()`, what it is.
-   
-   - Length, `length()`, how many elements it contains.
-   
-   - Attributes, `attributes()`, additional arbitrary metadata.
-   
- - No scalars in R.  They are length 1 vectors.
-
-**Note**: `is.vector()` does not test if an object is a vector.  Use `is.atomic()` or `is.list()` to test.
-
-#### Atomic vectors
-
- - There are four common types of atomic vectors (will show up in Lab 2)
- 
-   - logical
-   
-   - integer
-   
-   - numeric (actually double)
-   
-   - character
-
-
-
-Many commands in R generate a vector of output, rather than a single number.
-
-The `c()` command: creates a vector containing a list of specific elements.
-
-**Example 1**
-
-```{r}
-c(7, 3, 6, 0)
-c(73:60)
-c(7:3, 6:0)
-c(rep(7:3, 6), 0)
-```
-
-**Example 2**
-The command `seq()` creates a sequence of numbers.
-```{r}
-seq(7)
-seq(3, 70, by = 6)
-seq(3, 70, length = 6)
-```
-
- - Atomic vectors are **always flat**, even if you nest `c()`'s:
- 
-**Example 3**
-```{r}
-c(1, c(2, c(3, 4)))
 ```
