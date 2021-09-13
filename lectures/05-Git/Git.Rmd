@@ -212,7 +212,7 @@ On [GitHub.com](https://github.com):
 
 - Obtain [Student Developer Pack](https://education.github.com/pack).  (Should be done by now)
 
-- Create a private repository `Math-7360-FirstName-LastName` on `tulane-math7360`.
+- Create a private repository `Math-7360-FirstName-LastName` on `tulane-math-7360-2021`.
 
 On your local machine: 
 
@@ -220,9 +220,9 @@ On your local machine:
 
     ```{bash, eval=FALSE}
     # clone the project
-    git clone https://github.com/tulane-math7360/Math-7360-Xiang-Ji.git
+    git clone https://github.com/tulane-math-7360-2021/tulane-math-7360-2021.github.io.git
     # enter project folder
-    cd Math-7360-Xiang-Ji
+    cd tulane-math-7360-2021
     # what branches are there?
     git branch
     # create develop branch
