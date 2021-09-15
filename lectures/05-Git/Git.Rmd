@@ -1,5 +1,5 @@
 ---
-title: "Git"
+title: "Reproducible Research and Git"
 author: "Dr. Xiang Ji @ Tulane University"
 date: "Sep 13, 2021"
 output:
@@ -13,6 +13,63 @@ csl: ../apa.csl
 ```{r}
 rm(list = ls()) # clean-up workspace
 ```
+
+## Announcement
+ 
+ - Friday class will be self-paced.
+
+ - Office hour by appointment
+ 
+ - Play with Git and GitHub
+ 
+    - Read the error message
+    
+    - Google your error message (reliable solution source: [stackoverflow](https://stackoverflow.com/))
+
+## Reproducible Research
+
+### Definition
+
+In computational sciences this means:
+
+> the **data** and **code** used to make a finding are available and they are
+sufficient for an independent researcher to recreate the finding.
+>
+> Christopher Gandrud
+
+### Why
+
+- Science is about accumulating knowledge and reproducibility is the foundation.
+
+- Greater research impact.  Note: "a study can be reproducible and still be wrong."
+
+- Better work habits
+
+    - avoid thinking 'no one was looking'
+    
+    - communicate with future-you
+
+
+- Better teamwork
+
+    - communicate with another person.  For example, your instructor with your HWs.
+
+
+### Tools for reproducible research
+
+- Version control: Git+GitHub.
+
+- Distribute method implementation, e.g., R/Python/Julia packages, on GitHub or bitbucket.
+
+- Dynamic document: RMarkdown for R or [Jupyter](http://jupyter.org) for Julia/Python/R.
+
+- Docker container for reproducing a computing environment.
+
+- Cloud computing tools.
+
+- We are going to practice reproducible research **now**. That is to make your homework reproducible using Git, GitHub, and RMarkdown.
+
+--------------------------------------------------------------------------------------
 
 ## Collaborative research
 
@@ -32,7 +89,7 @@ Data scientists and statisticians, as opposed to closet mathematicians, rarely d
 >
 > Hadley Wickham
 
-## Why version control?
+### Why version control?
 
 - A centralized repository helps coordinate multi-person projects.
 
@@ -72,7 +129,7 @@ We use Git in this course.
 </div>
 
 
-## What do I need to use Git?
+### What do I need to use Git?
 
 - A **Git server** enabling multi-person collaboration through a centralized repository.
 
@@ -97,14 +154,14 @@ We use Git in this course.
 - Do **not** totally rely on GUI or IDE. Learn to use Git on command line, which is needed for cluster and cloud computing.
 
 
-## Git workflow
+### Git workflow
 
 <p align="center">
   <img src="./git_workflow.png" height="450">
 </p>
 
 
-## Git survival commands {.smaller}
+### Git survival commands {.smaller}
 
 - Synchronize local Git directory with remote repository:
     ```{bash, eval=FALSE}
@@ -129,7 +186,7 @@ same as `git fetch` plus `git merge`.
     git push
     ```
     
-## Git basic usage
+### Git basic usage
 
 - Register for an account on a Git server, e.g., github.com.
 
@@ -172,7 +229,7 @@ Name and email appear in each commit you make.
     - `git rm FILENAME`: remove files from git control.
     
 
-## Branching in Git
+### Branching in Git
 
 <p align="center">
   <img src="./git_branching.png" height="450">
@@ -206,7 +263,7 @@ Name and email appear in each commit you make.
     
     - `git tag tagname`: create a tag.
 
-## Sample session | Getting started with homework
+### Sample session | Getting started with homework
 
 On [GitHub.com](https://github.com):
 
@@ -261,7 +318,7 @@ On your local machine:
     
 - RStudio has good Git integration. But practice command line operations also.    
 
-## Etiquettes of using Git
+### Etiquettes of using Git
 
 - Be judicious what to put in repository.
 
