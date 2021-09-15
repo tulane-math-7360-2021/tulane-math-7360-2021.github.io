@@ -61,7 +61,7 @@ sufficient for an independent researcher to recreate the finding.
 
 - Distribute method implementation, e.g., R/Python/Julia packages, on GitHub or bitbucket.
 
-- Dynamic document: RMarkdown for R or [Jupyter](http://jupyter.org) for Julia/Python/R.
+- Dynamic document: RMarkdown for R or [Jupyter](http://jupyter.org) notebook for Julia/Python/R.
 
 - Docker container for reproducing a computing environment.
 
