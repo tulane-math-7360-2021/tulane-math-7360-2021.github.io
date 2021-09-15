@@ -1,0 +1,137 @@
+---
+title: "Lab 02 R Basics"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Aug 28, 2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+
+> **Question 1** What type do the above vectors hold?
+
+```{r}
+a <- c(1L, "This is a character")
+str(a)
+
+b <- c(TRUE, "Hello World")
+str(b)
+
+c <- c(FALSE, 2)  # what is wrong here?
+str(c)
+```
+
+ - In R, integers are specified by the suffix `L` (e.g. `1L` is an integer 1).  All other numbers are of class `numeric`.
+   **Note** the function `is.integer` does not test whether a given variable has an integer value, but whether it belongs to the class integer.
+  
+ - So that integer or logical elements are coerced into characters to make `a` and `b` to be atomic vectors of characters.
+ 
+ - `2` here generates a numeric (double) instead of integer (without the suffix `L`).  Logical element is coerced to numeric and `c` is an atomic vector of numeric.
+
+## Explicit coercion
+
+```{r}
+# using the same objects a, b, c from the above question
+a.logical <- as.logical(a)
+a.integer <- as.integer(a)
+a.numeric <- as.numeric(a)
+
+b.logical <- as.logical(b)
+b.integer <- as.integer(b)
+b.numeric <- as.numeric(b)
+
+c.logical <- as.logical(c)
+c.integer <- as.integer(c)
+c.numeric <- as.numeric(c)
+c.character <- as.character(c)
+
+
+d <- -5:5
+d.logical <- as.logical(d)
+```
+
+> **Question 2** What do you get after the coercions?  Does any one suprise you?  Can you figure out why?
+
+Vectors `a`, `b`, and `c` already went through coercions before we explicitly coerce them.
+Therefore, when we explicitly coerce them, `a` and `b` are character vectors and `c` is numeric vector.
+
+Some surprises:
+
+ - Although `as.logical(1L) = TRUE`.  `as.logical("1") = FALSE`.
+ 
+ - Only `0L` and `0` are coerced into `FALSE` by `as.logical()`.  All others are coerced to `TRUE`.
+
+```{r}
+a
+str(a.logical)
+str(a.integer)
+str(a.numeric)
+
+b
+str(b.logical)
+str(b.integer)
+str(b.numeric)
+
+c
+str(c.logical)
+str(c.integer)
+str(c.numeric)
+
+```
+
+
+> **Question 3** Explain what you found.
+
+First let's create a vector $\mathbf{v} = (969, 971, 972, \dots, 1022, 1023)$ of 54 elements
+
+```{r}
+# finish the code below
+v <- c(969, 971:1023)
+# or
+v <- 969:1023
+v <- v[-2]
+
+length(v)
+```
+
+Then, let's compute the sum $\sum_{i=1}^{54}2^{v_i}$.
+
+```{r}
+# finish the code below
+v.power.sum <- sum(2^v)
+v.power.sum
+```
+
+How about only sum over 53 elements $\sum_{i=2}^{54}2^{v_i}$  (note that the sum starts from $v_2$).
+
+```{r}
+# finish the code below
+v.power.sum.53 <- sum(2^v[-1])
+v.power.sum.53
+```
+
+Now let's try putting the first element back
+
+```{r}
+v.power.sum.second <- 2^v[1] + sum(2^v[-1])
+v.power.sum.second
+```
+
+Reference - this should be the bigget number
+```{r}
+biggest <- .Machine$double.xmax
+biggest
+```
+
+Findings:
+
+ - The sum $\sum_{i=1}^{54}2^{v_i}$ creates an **overflow** error for double
+ 
+ - $\sum_{i=2}^{54}2^{v_i}$ does not create overflow error
+ 
+ - `2^v[1] + sum(2^v[-1])` actually equals `sum(2^v[-1])`.  This is because adding two numbers of dramatically different magnitudes, we get `a + b = b`!
+ It is referred to as Catastrophic cancellation caused by the finite-precision arithmetic.
+ You can read more [here](https://en.wikipedia.org/wiki/Loss_of_significance).

@@ -1,0 +1,133 @@
+---
+title: "Lab 02 R Basics"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Sep 17, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+## Announcement
+
+- Remember to accept GitHub organization invites.
+
+## Install Git
+
+Now it's time that we try out Git, the (probably most) popular version control software.
+Follow instructions on [installing Git](https://happygitwithr.com/install-git.html) from Happy Git and GitHub for the useR.
+ 
+ - For windows users, I highly recommend you using the **Option 1** so that we are on the same page.
+ 
+ - For mac users, open a terminal window and run command "xcode-select --install" that installs Xcode command line tools with Git for you.
+
+## (Optional) Git-related Yuja videos
+
+Lost ones may watch the several Yuja recordings on Canvas under `misc` of this week.
+These videos are from last year, don't forget to correct the course organization name.
+
+--------------------------------------------------------------------------------
+
+## More on types
+
+R has 5 basic or "atomic" classes of objects:
+
+ - character
+
+ - numeric (real numbers)
+ 
+ - integer
+ 
+ - complex (not used very often)
+ 
+ - logical (True/False)
+ 
+When working with _vectors_ in R, it is important to remember that a vector can only be composed of one data type.
+
+What happens when you put multiple objects with different type to form a vector?
+
+The answer is **coercion** (in other words, type conversion).
+
+Coercion means changing the type of an object and it happens by a pre-set order:
+
+logical < integer < numeric < character
+
+When you create a vector from objects with different types, the lower-order ones will be coerced to the highest type by R.
+
+```{r}
+a <- c(1L, "This is a character")
+
+b <- c(TRUE, "Hello World")
+
+c <- c(FALSE, 2)  # what is wrong here?
+```
+
+> **Question 1** What type do the above vectors hold?
+
+
+## Explicit coercion
+
+Of course you can coerce objects from one class (type) to another.
+We can do this by using "as.\*" functions where \* is the class (type) you want to coerce the object into.
+
+```{r}
+# using the same objects a, b, c from the above question
+a.logical <- as.logical(a)
+a.integer <- as.integer(a)
+a.numeric <- as.numeric(a)
+
+b.logical <- as.logical(b)
+b.integer <- as.integer(b)
+b.numeric <- as.numeric(b)
+
+c.logical <- as.logical(c)
+c.integer <- as.integer(c)
+c.numeric <- as.numeric(c)
+c.character <- as.character(c)
+
+
+d <- -5:5
+d.logical <- as.logical(d)
+```
+
+> **Question 2** What do you get after the coercions?  Does any one suprise you?  Can you figure out why?
+
+Hint: what are the types of each element in the vectors before you explicitly coerce them?
+
+## Try arithmetics
+
+OK, now let's try arithmetics.
+
+Easy, right?
+
+First let's create a vector $\mathbf{v} = (969, 971, 972, \dots, 1022, 1023)$ of 54 elements. (Attention, there is no $970$ in the vector)
+
+```{r}
+# finish the code below
+v <- c()
+```
+
+Then, let's compute the sum $\sum_{i=1}^{54}2^{v_i}$.
+
+```{r}
+# finish the code below
+v.power.sum <- sum()
+```
+
+How about only sum over 53 elements $\sum_{i=2}^{54}2^{v_i}$  (note that the sum starts from $v_2$).
+
+```{r}
+# finish the code below
+v.power.sum.53 <- sum()
+```
+
+Now let's try putting the first element back
+
+```{r}
+v.power.sum.second <- 2^v[1] + sum()
+```
+
+> **Question 3** Explain what you found.
+
