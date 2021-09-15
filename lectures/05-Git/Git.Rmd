@@ -201,11 +201,11 @@ Name and email appear in each commit you make.
 
 - Initialize a project.
 
-    - Create a repository, e.g., `tulane-math7360` on GitHub.
+    - Create a repository, e.g., `tulane-math-7360-2021` on GitHub.
     
     - Clone the repository to your local machine:
     ```{bash, eval=FALSE}
-    git clone https://github.com/tulane-math7360/Math-7360-Xiang-Ji.git
+    git clone https://github.com/tulane-math-7360-2021/Math-7360-Xiang-Ji.git
     ```
 
 - Working with your local copy.
