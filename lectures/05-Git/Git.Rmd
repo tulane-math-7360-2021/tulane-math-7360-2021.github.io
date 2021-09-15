@@ -195,7 +195,7 @@ same as `git fetch` plus `git merge`.
 - Identify yourself at local machine, e.g.,
     ```{bash, eval=FALSE}
     git config --global user.name "Your Name"
-    git config --global user.email "your_email@ucla.edu"
+    git config --global user.email "your_email@tulane.edu"
     ```
 Name and email appear in each commit you make.
 
