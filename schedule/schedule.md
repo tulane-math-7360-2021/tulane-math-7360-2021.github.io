@@ -29,7 +29,7 @@ Topics:
 | **08/30** Class cancelled <br> (Hurricane Ida) | **09/01** Class cancelled <br> (Hurricane Ida) | **09/03** Class cancelled <br> (Hurricane Ida) | |
 | **09/06** Class cancelled <br> (Hurricane Ida) | **09/08** Class cancelled <br> (Hurricane Ida) | **09/10** Class cancelled <br> (Hurricane Ida) | |
 | **09/13** R basics [[Rmd](../lectures/04-R_cont/R_cont.Rmd)][[HTML](../lectures/04-R_cont/R_cont.html)]  | **09/15** Reproducible Research and Git [[Rmd](../lectures/05-Git/Git.Rmd)][[HTML](../lectures/05-Git/Git.html)] | **09/17** Lab 2 [[Rmd](../lectures/lab-02-Basics/lab_02_R_basics.Rmd)][[HTML](../lectures/lab-02-Basics/lab_02_R_basics.html)] | [HW1](../HW/HW1/HW1_Fall_2021.pdf) |
-| | | **09/24** Fall Break | |
+| **09/20** Data structure and Functions [[Rmd](../lectures/06-Data_structure/Data_Structure.Rmd)][[HTML](../06-Data_structure/Data_Structure.html)] | | **09/24** Fall Break | |
 | **11/22** Thanksgiving Holiday |  **11/24** Thanksgiving Holiday |  **11/26** Thanksgiving Holiday | |
 
 
