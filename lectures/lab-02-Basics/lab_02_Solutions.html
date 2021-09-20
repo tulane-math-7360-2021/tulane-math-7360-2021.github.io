@@ -177,6 +177,27 @@ pre code {
 </ul>
 </div>
 
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 4.1.1 (2021-08-10)
+## Platform: aarch64-apple-darwin20 (64-bit)
+## Running under: macOS Big Sur 11.5.2
+## 
+## Matrix products: default
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## loaded via a namespace (and not attached):
+##  [1] digest_0.6.27     R6_2.5.0          jsonlite_1.7.2    magrittr_2.0.1   
+##  [5] evaluate_0.14     rlang_0.4.11      stringi_1.7.3     jquerylib_0.1.4  
+##  [9] bslib_0.2.5.1     rmarkdown_2.10    tools_4.1.1       stringr_1.4.0    
+## [13] xfun_0.25         yaml_2.2.1        compiler_4.1.1    htmltools_0.5.1.1
+## [17] knitr_1.33        sass_0.4.0</code></pre>
 <blockquote>
 <p><strong>Question 1</strong> What type do the above vectors hold?</p>
 </blockquote>
@@ -265,14 +286,32 @@ length(v)</code></pre>
 v.power.sum &lt;- sum(2^v)
 v.power.sum</code></pre>
 <pre><code>## [1] 1.797693e+308</code></pre>
+<p>well, the above sum returned <code>Inf</code> as of last year. Clearly, some update of R has pushed this limit.</p>
+<p>Let’s take a look over <span class="math inline">\(\mathbf{w} = (968, 969, 971, 972, \dots, 1022, 1023)\)</span></p>
+<pre class="r"><code>w &lt;- c(968:969, 971:1023)
+w</code></pre>
+<pre><code>##  [1]  968  969  971  972  973  974  975  976  977  978  979  980  981  982  983
+## [16]  984  985  986  987  988  989  990  991  992  993  994  995  996  997  998
+## [31]  999 1000 1001 1002 1003 1004 1005 1006 1007 1008 1009 1010 1011 1012 1013
+## [46] 1014 1015 1016 1017 1018 1019 1020 1021 1022 1023</code></pre>
+<pre class="r"><code>(w.power.sum &lt;- sum(2^w))</code></pre>
+<pre><code>## [1] Inf</code></pre>
 <p>How about only sum over 53 elements <span class="math inline">\(\sum_{i=2}^{54}2^{v_i}\)</span> (note that the sum starts from <span class="math inline">\(v_2\)</span>).</p>
 <pre class="r"><code># finish the code below
 v.power.sum.53 &lt;- sum(2^v[-1])
 v.power.sum.53</code></pre>
 <pre><code>## [1] 1.797693e+308</code></pre>
+<p>How about only sum over 54 elements <span class="math display">\[\sum_{i=2}^{55}2^{w_i}\]</span></p>
+<pre class="r"><code>w.power.sum.54 &lt;- sum(2^w[-1])
+w.power.sum.54</code></pre>
+<pre><code>## [1] 1.797693e+308</code></pre>
 <p>Now let’s try putting the first element back</p>
 <pre class="r"><code>v.power.sum.second &lt;- 2^v[1] + sum(2^v[-1])
 v.power.sum.second</code></pre>
+<pre><code>## [1] 1.797693e+308</code></pre>
+<p>and for w too.</p>
+<pre class="r"><code>w.power.sum.second &lt;- 2^w[1] + sum(2^w[-1])
+w.power.sum.second</code></pre>
 <pre><code>## [1] 1.797693e+308</code></pre>
 <p>Reference - this should be the bigget number</p>
 <pre class="r"><code>biggest &lt;- .Machine$double.xmax
@@ -280,9 +319,9 @@ biggest</code></pre>
 <pre><code>## [1] 1.797693e+308</code></pre>
 <p>Findings:</p>
 <ul>
-<li><p>The sum <span class="math inline">\(\sum_{i=1}^{54}2^{v_i}\)</span> creates an <strong>overflow</strong> error for double</p></li>
-<li><p><span class="math inline">\(\sum_{i=2}^{54}2^{v_i}\)</span> does not create overflow error</p></li>
-<li><p><code>2^v[1] + sum(2^v[-1])</code> actually equals <code>sum(2^v[-1])</code>. This is because adding two numbers of dramatically different magnitudes, we get <code>a + b = b</code>! It is referred to as Catastrophic cancellation caused by the finite-precision arithmetic. You can read more <a href="https://en.wikipedia.org/wiki/Loss_of_significance">here</a>.</p></li>
+<li><p>The sum <span class="math inline">\(\sum_{i=1}^{55}2^{w_i}\)</span> creates an <strong>overflow</strong> error for double</p></li>
+<li><p><span class="math inline">\(\sum_{i=2}^{55}2^{w_i}\)</span> does not create overflow error</p></li>
+<li><p><code>2^w[1] + sum(2^w[-1])</code> actually equals <code>sum(2^w[-1])</code>. This is because adding two numbers of dramatically different magnitudes, we get <code>a + b = b</code>! It is referred to as Catastrophic cancellation caused by the finite-precision arithmetic. You can read more <a href="https://en.wikipedia.org/wiki/Loss_of_significance">here</a>.</p></li>
 </ul>
 </div>
 
