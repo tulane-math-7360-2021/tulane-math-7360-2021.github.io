@@ -1,0 +1,177 @@
+---
+title: "Import and Tidy Data"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Sep 16, 2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library("tidyverse")
+```
+
+## Announcement
+
+- We will go over HW1 next Monday
+
+- Mid-term evaluation (voluntary, anonymous, ~ 10 min)
+
+## Acknowledgement
+
+Dr. Hua Zhou's [slides](https://ucla-biostat203b-2020winter.github.io/slides/05-tidy/tidy.html)
+
+
+## Tidy data | r4ds chapter 12
+
+> “Happy families are all alike; every unhappy family is unhappy in its own way.” –– Leo Tolstoy
+>
+> “Tidy datasets are all alike, but every messy dataset is messy in its own way.” –– Hadley Wickham
+
+### Tidy data
+
+There are three interrelated rules which make a dataset tidy:
+
+- Each variable must have its own column.
+
+- Each observation must have its own row.
+
+- Each value must have its own cell.
+
+<p align="center">
+<img src="./tidy-1.png" height="200">
+</p>
+
+----
+
+- Example table1
+    ```{r}
+    table1
+    ```
+is tidy.
+
+----
+
+- Example table2
+    ```{r}
+    table2
+    ```
+is not tidy.
+
+----
+
+- Example table3
+    ```{r}
+    table3
+    ```
+is not tidy.
+    
+----
+
+- Example table4a
+    ```{r}
+    table4a
+    ```
+is not tidy.    
+
+- Example table4b
+    ```{r}
+    table4b
+    ```
+is not tidy.
+
+
+## Pivoting
+
+Typical issues:
+
+- One variable might be spread across multiple columns
+
+- One variable might be scattered across multiple rows
+
+### Longer
+
+<p align="center">
+<img src="./tidy-9.png" height="200">
+</p>
+
+- `pivot_longer()` columns into a new pair of variables.
+    ```{r}
+    table4a %>%
+      pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
+    ```
+
+----
+
+- We can pivot table4b longer too and then join them
+    ```{r}
+    tidy4a <- table4a %>% 
+      pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
+    tidy4b <- table4b %>% 
+      pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
+    left_join(tidy4a, tidy4b)
+    ```
+
+### Wider
+
+<p align="center">
+<img src="./tidy-8.png" height="200">
+</p>
+
+- `pivot_wider()` is the opposite of `pivot_longer()`.
+    ```{r}
+    table2
+    table2 %>%
+      pivot_wider(names_from = type, values_from = count)
+    ```
+
+## Separating
+
+<p align="center">
+<img src="./tidy-17.png" height="200">
+</p>
+
+- 
+    ```{r}
+    table3 %>% 
+      separate(rate, into = c("cases", "population"))
+    ```
+
+----
+
+- Seperate into numeric values:
+    ```{r}
+    table3 %>% 
+      separate(rate, into = c("cases", "population"), convert = TRUE)
+    ```
+
+----
+
+- Separate at a fixed position:
+    ```{r}
+    table3 %>% 
+      separate(year, into = c("century", "year"), sep = 2)
+    ```
+
+## Unite
+
+<p align="center">
+<img src="./tidy-18.png" height="200">
+</p>
+
+- 
+    ```{r}
+    table5
+    ```
+
+----
+
+- `unite()` is the inverse of `separate()`. 
+    ```{r}
+    table5 %>% 
+      unite(new, century, year, sep = "")
+    ```

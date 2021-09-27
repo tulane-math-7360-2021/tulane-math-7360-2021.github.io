@@ -1,7 +1,7 @@
 ---
 title: "R Programming"
 author: "Dr. Xiang Ji @ Tulane University"
-date: "Sep 22, 2021"
+date: "Sep 27, 2021"
 output:
   html_document:
     toc: true
@@ -16,6 +16,24 @@ rm(list = ls()) # clean-up workspace
 knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
 sessionInfo()
 ```
+
+## Annoucement
+
+- **One-page** project description due this Wednesday
+
+- HW1 due this Friday.  Extension?
+
+- Questions regarding HW1 problem 3 from Viraj (everyone should thank him)
+
+  1. For creating the variable u, should we create it as a vector (using the c function) or as a matrix <br>
+  _ans_: `u` is a column vector.
+  2. For cases where we are multiplying a 6 by 6 matrix with a 1 by 1 or a 1 by 6 matrix, could we use the as.vector or the c() function on the 1 by 1 or the 1 by 6 matrix to compute the matrix-vector product? <br>
+  _ans_: you can multiple a scaler to a matrix.  The result is an element-wise multiplication of the scaler with every entry in the matrix.  You might want to try as.numeric(scaler) * matrix.
+  3.  Is problem 3e asking for the maximum of the sum of all the values in matrix U? <br>
+  _ans_: It's asking for the maximum of row sums. (maximum over row index i, sum over column index j)
+  4. Lastly for products where we are multiplying matrices, we should be using the matrix multiplication function (%*%) and not the element wise multiplication function, is that correct?  <br>
+  _ans_: Yes.  When performing matrix-matrix / matrix-vector multiplications, use matrix operations with %*%.
+  
 
 ## Acknowledgement
 

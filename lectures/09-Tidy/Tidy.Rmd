@@ -1,0 +1,205 @@
+---
+title: "Import and Tidy Data"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Sep 27, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+sessionInfo()
+```
+
+We follow [R for Data Science](http://r4ds.had.co.nz) by Garrett Grolemund and Hadley Wickham for the next couple of lectures.
+
+## Acknowledgement
+
+Dr. Hua Zhou's [slides](https://ucla-biostat203b-2020winter.github.io/slides/05-tidy/tidy.html)
+
+## Workflow
+
+A typical data science project:
+
+<p align="center">
+<img src="./data-science-explore.png" height="300">
+</p>
+
+- Data wrangling.
+
+    - The art of getting your data into R in a useful form for visualisation and modelling.
+    
+    - Data import
+
+    - Data transformation.
+
+        - select important variables
+        
+        - filter out key observations
+        
+        - create new variables
+        
+        - compute summaries
+    
+- Visualisation.
+
+    - Make elegant and informative plots that help you understand data.
+
+## Data wrangling
+
+There are three main parts to data wrangling:
+<p align="center">
+<img src="./data-science-wrangle.png" height="300">
+</p>
+
+We will proceed with:
+
+- [tibbles](https://r4ds.had.co.nz/tibbles.html) | r4ds chapter 10
+
+    - A data frame variant
+    
+    - how to construct them
+
+- [data import](https://r4ds.had.co.nz/data-import.html) | r4ds chapter 11
+
+    - how to get data from disk into R
+
+- [tidy data](https://r4ds.had.co.nz/tidy-data.html#tidy-data-1) | r4ds chapter 12
+
+    - a consistent way of storing your data that makes everything easier (transformation, visualisation, and modelling)
+    
+## [Tidyverse](https://www.tidyverse.org)
+
+- `tidyverse` is a collection of R packages that make data wrangling easy.
+
+- Install `tidyverse` from RStudio menu `Tools -> Install Packages...` or
+    ```{r, eval = FALSE}
+    install.packages("tidyverse")
+    ```
+
+- After installation, load `tidyverse` by
+    ```{r}
+    library("tidyverse")
+    environment(filter)
+    environment(stats::filter)
+    ```
+    
+## Tibbles
+
+Tibbles are one of the unifying features of the tidyverse.
+
+### create tibbles
+
+- coerce a data frame to a tibble `as_tibble()`
+
+    - Most other R packages use regular data frames.
+    
+    - `iris` is a data frame available in base R:
+    
+    ```{r}
+    # a regular data frame
+    iris
+    ```
+    
+    - Convert a regular data frame to tibble:
+    ```{r}
+    as_tibble(iris)
+    ```
+
+    - Convert a tibble to data frame:
+    ```{r, eval = FALSE}
+    as.data.frame(tb)
+    ```
+    
+----
+
+- Create tibble from individual vectors. 
+
+    ```{r}
+    tibble(
+      x = 1:5, 
+      y = 1, 
+      z = x ^ 2 + y
+    )
+    ```
+    - Note values for y are recycled
+
+    - Only length one vectors are recycled
+    
+    - `tibble()` does less than `data.frame()`:
+    
+        1. never changes the type of the inputs (e.g. it never converts strings to factors)
+        
+        2. never changes the names of variables
+        
+        3. never creates row names
+
+- Transposed tibbles:
+    ```{r}
+    tribble(
+      ~x, ~y, ~z,
+      #--|--|----
+      "a", 2, 3.6,
+      "b", 1, 8.5
+    )
+    ```
+
+----
+
+## Printing of a tibble
+
+- By default, tibble prints the first 10 rows and all columns that fit on screen.
+
+    - you don't accidentally overwhelm your console when printing large data frames
+    ```{r}
+    nycflights13::flights
+    ```
+
+- To change number of rows and columns to display:
+    ```{r}
+    nycflights13::flights %>% 
+      print(n = 10, width = Inf)
+    ```
+Here we see the **pipe operator** `%>%` pipes the output from previous command to the (first) argument of the next command.
+
+
+- To change the default print setting:
+    - `options(tibble.print_max = n, tibble.print_min = m)`: if more than `n` rows, print only `m` rows.
+    - `options(tibble.print_min = Inf)`: print all roww.
+    - `options(tibble.width = Inf)`: print all columns.
+
+----
+
+## Subsetting
+
+- 
+    ```{r}
+    df <- tibble(
+      x = runif(5),
+      y = rnorm(5)
+    )
+    df
+    ```
+
+- Extract by name:
+    ```{r}
+    df$x
+    df[["x"]]
+    ```
+    
+- Extract by position：
+    ```{r}
+    df[[1]]
+    ```
+
+- Pipe:
+    ```{r}
+    df %>% .$x
+    df %>% .[["x"]]
+    ```
+`.` is a special placeholder.
+
