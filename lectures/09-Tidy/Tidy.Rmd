@@ -15,11 +15,25 @@ rm(list = ls()) # clean-up workspace
 sessionInfo()
 ```
 
-We follow [R for Data Science](http://r4ds.had.co.nz) by Garrett Grolemund and Hadley Wickham for the next couple of lectures.
+## Announcement
+
+- Profiling example with pre-allocation: you do not know unless you profile.
+
+- `read.csv()`, `read.table()`, `read.delim()` functions performs data importation.
+
+```{r}
+(oringp <- read.table("https://raw.githubusercontent.com/tulane-math-7360-2021/tulane-math-7360-2021.github.io/main/HW/HW1/oringp.dat"))
+(oringp <- read.table("../../HW/HW1/oringp.dat"))
+```
 
 ## Acknowledgement
 
 Dr. Hua Zhou's [slides](https://ucla-biostat203b-2020winter.github.io/slides/05-tidy/tidy.html)
+
+
+## Source
+We follow [R for Data Science](http://r4ds.had.co.nz) by Garrett Grolemund and Hadley Wickham for the next couple of lectures.
+
 
 ## Workflow
 
