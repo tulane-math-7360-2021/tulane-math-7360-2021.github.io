@@ -17,7 +17,13 @@ sessionInfo()
 
 ## Announcement
 
+- Poll on HW1 extension
+
 - Profiling example with pre-allocation: you do not know unless you profile.
+
+  - What I forgot last time: the size of `data` is different in the last two cases.
+  
+  - The example with pre-allocated memory ran too fast that I had to increase the size by 10 fold to accommodate for the timer.
 
 - `read.csv()`, `read.table()`, `read.delim()` functions performs data importation.
 

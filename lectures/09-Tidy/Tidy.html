@@ -213,7 +213,12 @@ sessionInfo()</code></pre>
 <div id="announcement" class="section level2">
 <h2>Announcement</h2>
 <ul>
-<li><p>Profiling example with pre-allocation: you do not know unless you profile.</p></li>
+<li><p>Poll on HW1 extension</p></li>
+<li><p>Profiling example with pre-allocation: you do not know unless you profile.</p>
+<ul>
+<li><p>What I forgot last time: the size of <code>data</code> is different in the last two cases.</p></li>
+<li><p>The example with pre-allocated memory ran too fast that I had to increase the size by 10 fold to accommodate for the timer.</p></li>
+</ul></li>
 <li><p><code>read.csv()</code>, <code>read.table()</code>, <code>read.delim()</code> functions performs data importation.</p></li>
 </ul>
 <pre class="r"><code>(oringp &lt;- read.table(&quot;https://raw.githubusercontent.com/tulane-math-7360-2021/tulane-math-7360-2021.github.io/main/HW/HW1/oringp.dat&quot;))</code></pre>
@@ -660,26 +665,26 @@ iris</code></pre>
 )
 df</code></pre>
 <pre><code>## # A tibble: 5 × 2
-##       x      y
-##   &lt;dbl&gt;  &lt;dbl&gt;
-## 1 0.338 -0.458
-## 2 0.582 -1.32 
-## 3 0.198 -0.348
-## 4 0.448 -1.36 
-## 5 0.108  0.782</code></pre></li>
+##       x       y
+##   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 0.827  0.742 
+## 2 0.863 -1.47  
+## 3 0.976 -0.0717
+## 4 0.432 -2.47  
+## 5 0.860  0.546</code></pre></li>
 <li><p>Extract by name:</p>
 <pre class="r"><code>df$x</code></pre>
-<pre><code>## [1] 0.3380151 0.5822422 0.1982541 0.4478884 0.1076016</code></pre>
+<pre><code>## [1] 0.8269205 0.8625164 0.9756068 0.4323691 0.8595962</code></pre>
 <pre class="r"><code>df[[&quot;x&quot;]]</code></pre>
-<pre><code>## [1] 0.3380151 0.5822422 0.1982541 0.4478884 0.1076016</code></pre></li>
+<pre><code>## [1] 0.8269205 0.8625164 0.9756068 0.4323691 0.8595962</code></pre></li>
 <li><p>Extract by position：</p>
 <pre class="r"><code>df[[1]]</code></pre>
-<pre><code>## [1] 0.3380151 0.5822422 0.1982541 0.4478884 0.1076016</code></pre></li>
+<pre><code>## [1] 0.8269205 0.8625164 0.9756068 0.4323691 0.8595962</code></pre></li>
 <li><p>Pipe:</p>
 <pre class="r"><code>df %&gt;% .$x</code></pre>
-<pre><code>## [1] 0.3380151 0.5822422 0.1982541 0.4478884 0.1076016</code></pre>
+<pre><code>## [1] 0.8269205 0.8625164 0.9756068 0.4323691 0.8595962</code></pre>
 <pre class="r"><code>df %&gt;% .[[&quot;x&quot;]]</code></pre>
-<pre><code>## [1] 0.3380151 0.5822422 0.1982541 0.4478884 0.1076016</code></pre>
+<pre><code>## [1] 0.8269205 0.8625164 0.9756068 0.4323691 0.8595962</code></pre>
 <p><code>.</code> is a special placeholder.</p></li>
 </ul>
 </div>
