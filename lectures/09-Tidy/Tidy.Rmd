@@ -25,11 +25,12 @@ sessionInfo()
   
   - The example with pre-allocated memory ran too fast that I had to increase the size by 10 fold to accommodate for the timer.
 
-- `read.csv()`, `read.table()`, `read.delim()` functions performs data importation.
+- `read.csv()`, `read.table()`, `read.delim()` functions import data from files.
   ```{r}
   (oringp <- read.table("https://raw.githubusercontent.com/tulane-math-7360-2021/tulane-math-7360-2021.github.io/main/HW/HW1/oringp.dat"))
   (oringp <- read.table("../../HW/HW1/oringp.dat"))
   ```
+- **One-page** project description due today.
 
 - Facilities email: please move furniture back after class.
 
@@ -148,8 +149,30 @@ Tibbles are one of the unifying features of the tidyverse.
     )
     ```
     - Note values for y are recycled
+    
+      - We know that scalars are just length-1 vectors, how does R perform operations between vectors of different length?
+      
+        - If the longer object length **is** multiple of the shorter object length, the shorter object is recycled
+        
+        - If the longer object length is **not** multiple of the shorter object length, R outputs a warning
+      ```{r}
+      long.vec <- 1:10
+      short.vec.1 <- 1:2
+      short.vec.2 <- 1:3
+      (long.vec * short.vec.1)
+      (long.vec + short.vec.1)
+      (long.vec * short.vec.2)
+      (long.vec + short.vec.2)
+      ```
 
     - Only length one vectors are recycled
+      ```{r,  error=TRUE}
+      tibble(
+        x = 1:5, 
+        y = 1:2, 
+        z = x ^ 2 + y
+      )
+      ```
     
     - `tibble()` does less than `data.frame()`:
     

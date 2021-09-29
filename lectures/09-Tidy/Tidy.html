@@ -234,7 +234,7 @@ sessionInfo()</code></pre>
 <li><p>What I forgot last time: the size of <code>data</code> is different in the last two cases.</p></li>
 <li><p>The example with pre-allocated memory ran too fast that I had to increase the size by 10 fold to accommodate for the timer.</p></li>
 </ul></li>
-<li><p><code>read.csv()</code>, <code>read.table()</code>, <code>read.delim()</code> functions performs data importation.</p>
+<li><p><code>read.csv()</code>, <code>read.table()</code>, <code>read.delim()</code> functions import data from files.</p>
 <pre class="r"><code>(oringp &lt;- read.table(&quot;https://raw.githubusercontent.com/tulane-math-7360-2021/tulane-math-7360-2021.github.io/main/HW/HW1/oringp.dat&quot;))</code></pre>
 <pre><code>##      V1       V2 V3 V4 V5
 ## 1     1  4/12/81  6  0 66
@@ -287,6 +287,7 @@ sessionInfo()</code></pre>
 ## 22 61-B 11/26/85  6  0 76
 ## 23 61-C  1/12/86  6  1 58
 ## 24 61-I  1/28/86  6 NA 31</code></pre></li>
+<li><p><strong>One-page</strong> project description due today.</p></li>
 <li><p>Facilities email: please move furniture back after class.</p></li>
 </ul>
 </div>
@@ -572,8 +573,39 @@ iris</code></pre>
 ## 4     4     1    17
 ## 5     5     1    26</code></pre>
 <ul>
-<li><p>Note values for y are recycled</p></li>
-<li><p>Only length one vectors are recycled</p></li>
+<li><p>Note values for y are recycled</p>
+<ul>
+<li><p>We know that scalars are just length-1 vectors, how does R perform operations between vectors of different length?</p>
+<ul>
+<li><p>If the longer object length <strong>is</strong> multiple of the shorter object length, the shorter object is recycled</p></li>
+<li><p>If the longer object length is <strong>not</strong> multiple of the shorter object length, R outputs a warning</p></li>
+</ul></li>
+</ul>
+<pre class="r"><code>long.vec &lt;- 1:10
+short.vec.1 &lt;- 1:2
+short.vec.2 &lt;- 1:3
+(long.vec * short.vec.1)</code></pre>
+<pre><code>##  [1]  1  4  3  8  5 12  7 16  9 20</code></pre>
+<pre class="r"><code>(long.vec + short.vec.1)</code></pre>
+<pre><code>##  [1]  2  4  4  6  6  8  8 10 10 12</code></pre>
+<pre class="r"><code>(long.vec * short.vec.2)</code></pre>
+<pre><code>## Warning in long.vec * short.vec.2: longer object length is not a multiple of
+## shorter object length</code></pre>
+<pre><code>##  [1]  1  4  9  4 10 18  7 16 27 10</code></pre>
+<pre class="r"><code>(long.vec + short.vec.2)</code></pre>
+<pre><code>## Warning in long.vec + short.vec.2: longer object length is not a multiple of
+## shorter object length</code></pre>
+<pre><code>##  [1]  2  4  6  5  7  9  8 10 12 11</code></pre></li>
+<li><p>Only length one vectors are recycled</p>
+<pre class="r"><code>tibble(
+  x = 1:5, 
+  y = 1:2, 
+  z = x ^ 2 + y
+)</code></pre>
+<pre><code>## Error: Tibble columns must have compatible sizes.
+## * Size 5: Existing data.
+## * Size 2: Column `y`.
+## ℹ Only values of size one are recycled.</code></pre></li>
 <li><p><code>tibble()</code> does less than <code>data.frame()</code>:</p>
 <ol style="list-style-type: decimal">
 <li><p>never changes the type of the inputs (e.g. it never converts strings to factors)</p></li>
@@ -681,26 +713,26 @@ iris</code></pre>
 )
 df</code></pre>
 <pre><code>## # A tibble: 5 × 2
-##       x       y
-##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1 0.830  2.86  
-## 2 0.297 -1.35  
-## 3 0.895 -0.814 
-## 4 0.456 -0.0164
-## 5 0.560  1.90</code></pre></li>
+##        x      y
+##    &lt;dbl&gt;  &lt;dbl&gt;
+## 1 0.474   0.321
+## 2 0.782   0.689
+## 3 0.623   0.332
+## 4 0.507   0.583
+## 5 0.0315 -0.281</code></pre></li>
 <li><p>Extract by name:</p>
 <pre class="r"><code>df$x</code></pre>
-<pre><code>## [1] 0.8300721 0.2974250 0.8950230 0.4555493 0.5604299</code></pre>
+<pre><code>## [1] 0.47383634 0.78150361 0.62258880 0.50668483 0.03145516</code></pre>
 <pre class="r"><code>df[[&quot;x&quot;]]</code></pre>
-<pre><code>## [1] 0.8300721 0.2974250 0.8950230 0.4555493 0.5604299</code></pre></li>
+<pre><code>## [1] 0.47383634 0.78150361 0.62258880 0.50668483 0.03145516</code></pre></li>
 <li><p>Extract by position：</p>
 <pre class="r"><code>df[[1]]</code></pre>
-<pre><code>## [1] 0.8300721 0.2974250 0.8950230 0.4555493 0.5604299</code></pre></li>
+<pre><code>## [1] 0.47383634 0.78150361 0.62258880 0.50668483 0.03145516</code></pre></li>
 <li><p>Pipe:</p>
 <pre class="r"><code>df %&gt;% .$x</code></pre>
-<pre><code>## [1] 0.8300721 0.2974250 0.8950230 0.4555493 0.5604299</code></pre>
+<pre><code>## [1] 0.47383634 0.78150361 0.62258880 0.50668483 0.03145516</code></pre>
 <pre class="r"><code>df %&gt;% .[[&quot;x&quot;]]</code></pre>
-<pre><code>## [1] 0.8300721 0.2974250 0.8950230 0.4555493 0.5604299</code></pre>
+<pre><code>## [1] 0.47383634 0.78150361 0.62258880 0.50668483 0.03145516</code></pre>
 <p><code>.</code> is a special placeholder.</p></li>
 </ul>
 </div>
