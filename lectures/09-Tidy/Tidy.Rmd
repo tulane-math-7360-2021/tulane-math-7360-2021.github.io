@@ -26,11 +26,12 @@ sessionInfo()
   - The example with pre-allocated memory ran too fast that I had to increase the size by 10 fold to accommodate for the timer.
 
 - `read.csv()`, `read.table()`, `read.delim()` functions performs data importation.
+  ```{r}
+  (oringp <- read.table("https://raw.githubusercontent.com/tulane-math-7360-2021/tulane-math-7360-2021.github.io/main/HW/HW1/oringp.dat"))
+  (oringp <- read.table("../../HW/HW1/oringp.dat"))
+  ```
 
-```{r}
-(oringp <- read.table("https://raw.githubusercontent.com/tulane-math-7360-2021/tulane-math-7360-2021.github.io/main/HW/HW1/oringp.dat"))
-(oringp <- read.table("../../HW/HW1/oringp.dat"))
-```
+- Facilities email: please move furniture back after class.
 
 ## Acknowledgement
 
