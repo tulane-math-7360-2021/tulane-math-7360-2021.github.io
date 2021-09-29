@@ -213,7 +213,7 @@ Here we see the **pipe operator** `%>%` pipes the output from previous command t
 
 - To change the default print setting:
     - `options(tibble.print_max = n, tibble.print_min = m)`: if more than `n` rows, print only `m` rows.
-    - `options(tibble.print_min = Inf)`: print all roww.
+    - `options(tibble.print_min = Inf)`: print all rows.
     - `options(tibble.width = Inf)`: print all columns.
 
 ----
@@ -466,38 +466,48 @@ is not tidy.
 is not tidy.
 
 
-## Gathering
+## Pivoting
+
+Typical issues:
+
+- One variable might be spread across multiple columns
+
+- One variable might be scattered across multiple rows
+
+### Longer
 
 <p align="center">
 <img src="./tidy-9.png" height="200">
 </p>
 
-- `gather` columns into a new pair of variables.
+- `pivot_longer()` columns into a new pair of variables.
     ```{r}
     table4a %>%
-      gather(`1999`, `2000`, key = "year", value = "cases")
+      pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
     ```
 
 ----
 
-- We can gather table4b too and then join them
+- We can pivot table4b longer too and then join them
     ```{r}
     tidy4a <- table4a %>% 
-      gather(`1999`, `2000`, key = "year", value = "cases")
+      pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
     tidy4b <- table4b %>% 
-      gather(`1999`, `2000`, key = "year", value = "population")
+      pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
     left_join(tidy4a, tidy4b)
     ```
 
-## Spreading
+### Wider
 
 <p align="center">
 <img src="./tidy-8.png" height="200">
 </p>
 
-- Spreading is the opposite of gathering.
+- `pivot_wider()` is the opposite of `pivot_longer()`.
     ```{r}
-    spread(table2, key = type, value = count)
+    table2
+    table2 %>%
+      pivot_wider(names_from = type, values_from = count)
     ```
 
 ## Separating
