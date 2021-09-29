@@ -1,0 +1,152 @@
+---
+title: "Lab 03 Functions"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Sep 4, 2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+## Some exercise on R functions
+
+```{r}
+rm(list = ls()) # clean up workspace first
+```
+
+
+### [case study on numerical integration](http://adv-r.had.co.nz/Functional-programming.html#numerical-integration)
+
+1. Finish the code that calculates `midpoint` and `trapezoid` values.
+
+```{r}
+# if you are modifying this source file directly, remember to change the above flag to eval=TRUE
+# finish the code below
+midpoint <- function(f, a, b) {
+  result <- (b - a) * f((a + b) / 2)
+  return(result)
+}
+
+trapezoid <- function(f, a, b) {
+  result <- (b - a) / 2 * (f(a) + f(b))
+  return(result)
+}
+
+# what do you get?
+midpoint(sin, 0, pi)
+trapezoid(sin, 0, pi)
+```
+
+2.
+
+```{r}
+midpoint.composite <- function(f, a, b, n = 10) {
+  points <- seq(a, b, length = n + 1)
+
+  area <- 0
+  for (i in seq_len(n)) {
+    area <- area + midpoint(f, points[i], points[i + 1])
+  }
+  return(area)
+}
+
+trapezoid.composite <- function(f, a, b, n = 10) {
+  points <- seq(a, b, length = n + 1)
+  
+  area <- 0
+  for (i in seq_len(n)) {
+    area <- area + trapezoid(f, points[i], points[i + 1])
+  }
+  return(area)
+}
+
+midpoint.composite(sin, 0, pi, n = 10)
+
+midpoint.composite(sin, 0, pi, n = 100)
+
+midpoint.composite(sin, 0, pi, n = 1000)
+
+trapezoid.composite(sin, 0, pi, n = 10)
+
+trapezoid.composite(sin, 0, pi, n = 100)
+
+trapezoid.composite(sin, 0, pi, n = 1000)
+```
+
+
+3. (not in the above solutions, will be provided after Monday) Well, the above functions have loop! Let's try to avoid loops.
+
+```{r}
+midpoint.composite.vectorize <- function(f, a, b, n = 10) {
+  points <- seq(a, b, length = n + 1)
+  areas <- midpoint(f, points[-(n + 1)], points[-1])
+  return(sum(areas))
+}
+
+trapezoid.composite.vectorize <- function(f, a, b, n = 10) {
+  points <- seq(a, b, length = n + 1)
+  areas <- trapezoid(f, points[-(n + 1)], points[-1])
+  return(sum(areas))
+}
+
+midpoint.composite.vectorize(sin, 0, pi, n = 10)
+
+midpoint.composite.vectorize(sin, 0, pi, n = 100)
+
+midpoint.composite.vectorize(sin, 0, pi, n = 1000)
+
+trapezoid.composite.vectorize(sin, 0, pi, n = 10)
+
+trapezoid.composite.vectorize(sin, 0, pi, n = 100)
+
+trapezoid.composite.vectorize(sin, 0, pi, n = 1000)
+```
+
+4. compare run time
+
+```{r}
+system.time(midpoint.composite(sin, 0, pi, n = 10000))
+system.time(trapezoid.composite(sin, 0, pi, n = 10000))
+system.time(midpoint.composite.vectorize(sin, 0, pi, n = 10000))
+system.time(trapezoid.composite.vectorize(sin, 0, pi, n = 10000))
+```
+
+### Normal equations
+
+Now try to implement the Normal equations from scratch.
+$\hat{\beta} = (X^{\top}X)^{-1}X^{\top}Y$.
+
+```{r}
+my.normal.equations <- function(X, Y) {
+  if (!is.vector(Y)) {
+    stop("Y is not a vector!")
+  }
+  
+  if (!is.matrix(X)) {  # force X to be a matrix for now
+    stop("X is not a matrix!")
+  }
+  
+  if (dim(X)[1] != length(Y)) {
+    stop("Dimension mismatch between X and Y!")
+  }
+  
+  result <- solve(t(X) %*% X, t(X) %*% Y)
+  return(result) # finish the calculation
+}
+
+set.seed(7360)
+sample.size <- 100
+num.col <- 2
+X <- matrix(rnorm(sample.size * num.col), nrow = sample.size, ncol = num.col)
+X <- cbind(1, X)
+Y <- rnorm(sample.size)
+
+system.time(result.lm <- lm(Y ~ X[, 2] + X[, 3]))
+summary(result.lm)
+
+system.time(result.my.normal.equations <- my.normal.equations(X, Y))
+result.my.normal.equations
+
+```
