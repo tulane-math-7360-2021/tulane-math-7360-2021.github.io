@@ -59,7 +59,14 @@ A typical data science project:
     `hwy`: highway fuel efficiency, in mile per gallen (mpg).
 
 # Aesthetic mappings | r4ds chapter 3.3
-    
+
+## A graphing template
+
+```{r, eval = FALSE}
+ggplot(data = <DATA>) + 
+  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+```
+
 ## Scatter plot
 
 - `hwy` vs `displ` 
@@ -86,6 +93,7 @@ A typical data science project:
     ```{r, warning = FALSE}
     ggplot(data = mpg) + 
       geom_point(mapping = aes(x = displ, y = hwy, size = class))
+    #> Warning: Using size for a discrete variable is not advised.
     ```
 
 ## Transparency of points 
@@ -140,8 +148,13 @@ A typical data science project:
 
 ## `geom_smooth()`: smooth line
 
+How are these two plots similar?
+
 - `hwy` vs `displ` line:
+
     ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy))
     ggplot(data = mpg) + 
       geom_smooth(mapping = aes(x = displ, y = hwy))
     ```
@@ -333,7 +346,7 @@ The height of bar is total carat in each cut category.
 
 ----
 
-- `position_gitter()` add random noise to X and Y position of each
+- `position_jitter()` add random noise to X and Y position of each
 element to avoid overplotting:  
     ```{r}
     ggplot(data = mpg) + 
