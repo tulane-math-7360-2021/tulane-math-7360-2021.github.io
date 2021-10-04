@@ -1,0 +1,433 @@
+---
+title: "Data visualization with ggplot2"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Oct 4, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library("tidyverse")
+sessionInfo()
+```
+
+## Announcement
+
+- Mid-term evaluation (voluntary, anonymous, ~ 10 min)
+
+- Lab 3 solutions posted
+
+- HW1 deadline extended to this Wednesday _10/06_
+
+- HW2 will be posted on Friday
+
+## Acknowledgement
+
+Dr. Hua Zhou's [slides](https://ucla-biostat203b-2020winter.github.io/slides/06-vis/ggplot2.html)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = TRUE)
+```
+
+A typical data science project:
+
+<p align="center">
+<img src="./data-science.png" height="300">
+</p>
+
+## Data visualization
+
+> “The simple graph has brought more information to the data analyst’s mind than any other device.”  
+> 
+> John Tukey
+
+## `mpg` data
+
+- `mpg` data is available from the `ggplot2` package:
+    ```{r}
+    mpg %>% print(width = Inf)
+    ```
+
+- Tibbles are a generalized form of data frames, which are extensively used in tidyverse.
+    
+- `displ`: engine displacement, in litres.  
+    `hwy`: highway fuel efficiency, in mile per gallen (mpg).
+
+# Aesthetic mappings | r4ds chapter 3.3
+    
+## Scatter plot
+
+- `hwy` vs `displ` 
+    ```{r}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy))
+    ```
+    
+- An aesthetic maps data to a specifc feature of plot. 
+
+- Check available aesthetics for a geometric object by `?geom_point`.
+
+## Color of points
+
+- Color points according to `class`:
+    ```{r}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy, color = class))
+    ```
+
+## Size of points 
+
+- Assign different sizes to points according to `class`:
+    ```{r, warning = FALSE}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy, size = class))
+    ```
+
+## Transparency of points 
+
+- Assign different transparency levels to points according to `class`:
+    ```{r}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
+    ```
+
+## Shape of points 
+
+- Assign different shapes to points according to `class`:
+    ```{r, warning = FALSE}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy, shape = class))
+    ```
+
+- Maximum of 6 shapes at a time. By default, additional groups will go unplotted.
+
+## Manual setting of an aesthetic 
+
+- Set the color of all points to be blue:
+    ```{r}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+    ```
+
+# Facets | r4ds chapter 3.5
+
+## Facets 
+
+- Facets divide a plot into subplots based on the values of one or more discrete variables.
+
+- A subplot for each car type:
+    ```{r}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy)) + 
+      facet_wrap(~ class, nrow = 2)
+    ```
+    
+----
+
+- A subplot for each car type and drive:
+    ```{r}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy)) + 
+      facet_grid(drv ~ class)
+    ```
+    
+# Geometric objects | r4ds chapter 3.6
+
+## `geom_smooth()`: smooth line
+
+- `hwy` vs `displ` line:
+    ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
+    ggplot(data = mpg) + 
+      geom_smooth(mapping = aes(x = displ, y = hwy))
+    ```
+    
+## Different line types
+
+- Different line types according to `drv`:
+    ```{r, fig.width = 4.5, fig.height = 3, , message = FALSE}
+    ggplot(data = mpg) + 
+      geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
+    ```
+
+## Different line colors
+
+- Different line colors according to `drv`:
+    ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
+    ggplot(data = mpg) + 
+      geom_smooth(mapping = aes(x = displ, y = hwy, color = drv))
+    ```
+
+## Points and lines
+
+- Lines overlaid over scatter plot:
+    ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy)) + 
+      geom_smooth(mapping = aes(x = displ, y = hwy))
+    ```
+
+----
+
+- Same as
+    ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
+    ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+      geom_point() + geom_smooth()
+    ```
+
+## Aesthetics for each geometric object
+
+- Different aesthetics in different layers:
+    ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
+    ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+      geom_point(mapping = aes(color = class)) + 
+      geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE)
+    ```
+    
+# Bar plots | r4ds chapter 3.7
+
+## `diamonds` data 
+
+- `diamonds` data:
+    ```{r}
+    diamonds
+    ```
+    
+## Bar plot
+
+- `geom_bar()` creates bar chart:
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut))
+    ```
+
+----
+
+- Bar charts, like histograms, frequency polygons, smoothers, and boxplots, plot some computed variables instead of raw data.
+
+- Check available computed variables for a geometric object via help:
+    ```{r, eval = FALSE}
+    ?geom_bar
+    ```
+
+----
+
+- Use `stat_count()` directly:
+    ```{r}
+    ggplot(data = diamonds) + 
+      stat_count(mapping = aes(x = cut))
+    ```
+
+- `stat_count()` has a default geom `geom_bar()`.
+
+----
+
+- Display frequency instead of counts:
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut, y = stat(prop), group = 1))    
+    ```
+    Note the aesthetics mapping `group=1` overwrites the default grouping (by `cut`) by considering all observations as a group. Without this we get
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut, y = stat(prop)))    
+    ```
+    
+## `geom_bar()` vs `geom_col()`
+
+- `geom_bar()` makes the height of the bar proportional to the number of cases in each group (or if the weight aesthetic is supplied, the sum of the weights).
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut))
+    ```
+The height of bar is the number of diamonds in each cut category.
+    
+- `geom_col()` makes the heights of the bars to represent values in the data.
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_col(mapping = aes(x = cut, y = carat))
+    ```
+The height of bar is total carat in each cut category.
+
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut, weight = carat))
+    ```
+
+# Positional adjustments | r4ds chapter 3.8
+
+----
+
+- Color bar:
+    ```{r, results = 'hold'}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut, colour = cut))
+    ```
+
+----
+
+- Fill color: 
+    ```{r, results = 'hold'}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut, fill = cut))
+    ```
+
+----
+
+- Fill color according to another variable:
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut, fill = clarity))
+    ```
+
+1. The stacking is performed automatically by the **position adjustment** specified by the `position` argument.
+
+2. If you don't want a stacked bar chart, you can use one of three other options:
+    
+    - `"identity"`
+    
+    - `"dodge"`
+    
+    - `"fill"`
+    
+    - `"stack"` (default)
+
+----
+
+- `position = "identity"` will place each object exactly where it falls in the context of the graph.
+    ```{r}
+    ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) + 
+      geom_bar(alpha = 1/5, position = "identity")
+    
+    ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + 
+      geom_bar(fill = NA, position = "identity")    
+    ```
+    
+    - setting `alpha` to a small value makes the bars slightly transparent
+
+    - `identity` position adjustment is more useful (default) for 2d geoms
+
+----
+
+- `position = "fill"` works like stacking, but makes each set of stacked bars the same height.
+
+    - easier to compare proportions across groups.
+    
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
+    ```
+
+----
+
+- `position = "dodge"` places overlapping objects directly __beside__ one another.
+
+    ```{r}
+    ggplot(data = diamonds) + 
+      geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")    
+    ```
+
+----
+
+- `position_gitter()` add random noise to X and Y position of each
+element to avoid overplotting:  
+    ```{r}
+    ggplot(data = mpg) + 
+      geom_point(mapping = aes(x = displ, y = hwy), position = "jitter")
+    ```
+
+----
+
+- `geom_jitter()` is similar:  
+    ```{r}
+    ggplot(data = mpg) + 
+      geom_jitter(mapping = aes(x = displ, y = hwy))
+    ```
+
+
+# Coordinate systems | r4ds chapter 3.9
+
+- Recall the mpg data:
+    ```{r}
+    mpg
+    ```
+
+- Boxplots (grouped by class):
+    ```{r}
+    ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+      geom_boxplot()
+    ```
+
+----
+
+- `coord_cartesian()` is the default cartesian coordinate system:
+    ```{r}
+    ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+      geom_boxplot() + 
+      coord_cartesian(xlim = c(0, 5))
+    ```
+
+----
+
+- `coord_fixed()` specifies aspect ratio (x / y):
+    ```{r}
+    ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+      geom_boxplot() + 
+      coord_fixed(ratio = 1/2)
+    ```
+
+----
+
+- `coord_flip()` flips x- and y- axis:
+    ```{r}
+    ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+      geom_boxplot() + 
+      coord_flip()
+    ```
+
+--- 
+
+- Pie chart:
+    ```{r}
+    bar <- ggplot(data = diamonds) + 
+      geom_bar(
+        mapping = aes(x = cut, fill = cut), 
+        show.legend = FALSE,
+        width = 1
+      ) + 
+      theme(aspect.ratio = 1) +
+      labs(x = NULL, y = NULL)
+    
+    bar + coord_flip()
+    bar + coord_polar()
+    ```
+
+----
+
+- A map:
+    ```{r}
+    library("maps")
+    nz <- map_data("nz")
+    head(nz, 20)
+    ```
+    
+----    
+
+```{r}
+ggplot(nz, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "white", colour = "black")
+```
+
+----
+
+- `coord_quickmap()` puts maps in scale:
+    ```{r}
+    ggplot(nz, aes(long, lat, group = group)) +
+      geom_polygon(fill = "white", colour = "black") +
+      coord_quickmap()
+    ```
+
