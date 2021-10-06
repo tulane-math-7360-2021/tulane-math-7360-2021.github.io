@@ -1,7 +1,7 @@
 ---
 title: "Data visualization with ggplot2 (cont.)"
 author: "Dr. Xiang Ji @ Tulane University"
-date: "Sep 20, 2020"
+date: "Oct 6, 2021"
 output:
   html_document:
     toc: true
@@ -14,24 +14,117 @@ csl: ../apa.csl
 
 - Mid-term evaluation (voluntary, anonymous, ~ 10 min)
 
-    - 3 / 12
+    - 2 / 19
     
-    - Lab: 
-        
-        1. will try to put lab before Thursday noon
-        
-        2. Friday office hour is free for asking any questions (lab, HW, lectures, projects)
-        
-- HW2 will be posted soon
+- HW2 will be posted on Friday
 
-- HW1 will be graded by Questions 1 and 2
+- HW1 and project description will be graded this weekend
 
-- [HW1_keys](https://github.com/tulane-math7360/tulane-math7360.github.io/tree/master/HW/HW1)
+  - Check if you forgot to `merge` from develop branch into master branch
+  
+  - git push them into your repository (even if you have emailed me, just in case...)
+
+- Lab keys are for you to check your results.
+
+  - If your function behaves differently from what you expect, time to *DEBUG*
+
+- HW1 will be graded by two questions (selected non-randomly)
+
+## Acknowledgement
+
+Dr. Hua Zhou's [slides](https://ucla-biostat203b-2020winter.github.io/slides/06-vis/brolgar.html)
+
+[brolgar](http://brolgar.njtierney.com/) tutorial
+
 
 ```{r}
 rm(list = ls()) # clean-up workspace
 library("tidyverse")
+sessionInfo()
 ```
+
+
+# Coordinate systems | r4ds chapter 3.9
+
+- Recall the mpg data:
+    ```{r}
+    mpg
+    ```
+
+- Boxplots (grouped by class):
+    ```{r}
+    ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+      geom_boxplot()
+    ```
+
+----
+
+- `coord_cartesian()` is the default cartesian coordinate system:
+    ```{r}
+    ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+      geom_boxplot() + 
+      coord_cartesian(xlim = c(0, 5))
+    ```
+
+----
+
+- `coord_fixed()` specifies aspect ratio (x / y):
+    ```{r}
+    ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+      geom_boxplot() + 
+      coord_fixed(ratio = 1/2)
+    ```
+
+----
+
+- `coord_flip()` flips x- and y- axis:
+    ```{r}
+    ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+      geom_boxplot() + 
+      coord_flip()
+    ```
+
+--- 
+
+- Pie chart:
+    ```{r}
+    bar <- ggplot(data = diamonds) + 
+      geom_bar(
+        mapping = aes(x = cut, fill = cut), 
+        show.legend = FALSE,
+        width = 1
+      ) + 
+      theme(aspect.ratio = 1) +
+      labs(x = NULL, y = NULL)
+    
+    bar + coord_flip()
+    bar + coord_polar()
+    ```
+
+----
+
+- A map:
+    ```{r}
+    library("maps")
+    nz <- map_data("nz")
+    head(nz, 20)
+    ```
+    
+----    
+
+```{r}
+ggplot(nz, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "white", colour = "black")
+```
+
+----
+
+- `coord_quickmap()` puts maps in scale:
+    ```{r}
+    ggplot(nz, aes(long, lat, group = group)) +
+      geom_polygon(fill = "white", colour = "black") +
+      coord_quickmap()
+    ```
 
 
 # Graphics for communications | r4ds chapter 28
@@ -203,6 +296,17 @@ automatically adds scales
 <img src="./brewer-1.png" width="600">
 </p>
 
+- Current favorite, R package [wesanderson](https://github.com/karthik/wesanderson) that stores [Wes Anderson Palettes](https://wesandersonpalettes.tumblr.com/).
+
+```{r}
+#install.packages("wesanderson")
+library(wesanderson)
+for (name in names(wes_palettes)) {
+  print(wes_palette(name))
+}
+```
+
+
 - use `scale_colour_manual()` to use predefined mapping between values and colors
 
 ```{r}
@@ -329,3 +433,4 @@ ggsave("my-plot.pdf")
 ## Cheat sheet  
 
 [RStudio cheat sheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf) is extremely helpful.
+
