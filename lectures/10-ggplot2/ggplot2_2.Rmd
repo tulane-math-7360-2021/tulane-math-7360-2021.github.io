@@ -14,7 +14,7 @@ csl: ../apa.csl
 
 - Mid-term evaluation (voluntary, anonymous, ~ 10 min)
 
-    - 2 / 19
+    - 3 / 19
 
 - HW1 due today
     
@@ -25,18 +25,20 @@ csl: ../apa.csl
   - Check if you forgot to `merge` from develop branch into master branch
   
   - git push them into your repository (even if you have emailed me, just in case...)
+  
+  - HW1 will be graded by two questions (selected non-randomly)
 
 - Lab keys are for you to check your results.
 
   - If your function behaves differently from what you expect, time to *DEBUG*
+  
+- Try using your local `git` application.  Try not to upload files via GitHub webpage.
 
-- HW1 will be graded by two questions (selected non-randomly)
+  - At the minimum, avoid "Add files via upload" as commit message ([Howto](https://stackoverflow.com/questions/56085134/what-is-add-files-via-upload-commit-message-in-github-repositories)).
 
 ## Acknowledgement
 
-Dr. Hua Zhou's [slides](https://ucla-biostat203b-2020winter.github.io/slides/06-vis/brolgar.html)
-
-[brolgar](http://brolgar.njtierney.com/) tutorial
+Dr. Hua Zhou's [slides](https://ucla-biostat203b-2020winter.github.io/slides/06-vis/ggplot2.html)
 
 
 ```{r}
@@ -185,6 +187,18 @@ ggplot(nz, aes(x = long, y = lat, group = group)) +
       labs(
         x = quote(sum(x[i] ^ 2, i == 1, n)),
         y = quote(alpha + beta + frac(delta, theta))
+      )
+    ```
+    
+- R package `latex2exp` could convert tex math expressions ([Ref](https://stackoverflow.com/questions/12514612/how-to-annotate-ggplot-with-latex))
+
+    ```{r}
+    library(latex2exp)
+    df <- tibble(x = runif(10), y = runif(10))
+    ggplot(df, aes(x, y)) + geom_point() +
+      labs(
+        y = TeX("Example: $\\alpha + \\beta + \\frac{\\delta}{\\theta}$"),
+        x = TeX("$\\sum_{i = 1}^{n} x_i^2$")
       )
     ```
 
