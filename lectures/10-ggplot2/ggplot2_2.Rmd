@@ -221,12 +221,14 @@ ggplot(nz, aes(x = long, y = lat, group = group)) +
 - `dplyr::filter` function subsets a data frame, retaining all rows that satisfy your conditions
 
 ---
+
 - Annotate points
-    ```{r}
-    ggplot(mpg, aes(x = displ, y = hwy)) +
-      geom_point(aes(colour = class)) +
-      geom_text(aes(label = model), data = best_in_class)
-    ```
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(colour = class)) +
+  geom_text(aes(label = model), data = best_in_class)
+```
 
 ---
 
