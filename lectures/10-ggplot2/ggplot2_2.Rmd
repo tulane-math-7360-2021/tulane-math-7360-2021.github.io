@@ -15,6 +15,8 @@ csl: ../apa.csl
 - Mid-term evaluation (voluntary, anonymous, ~ 10 min)
 
     - 2 / 19
+
+- HW1 due today
     
 - HW2 will be posted on Friday
 
