@@ -275,6 +275,19 @@ automatically adds scales
       geom_point() +
       scale_y_continuous(breaks = seq(15, 40, by = 5))
     ```
+---
+
+When you have relatively few data and want to highlight exactly where the observations occur.
+This plot that shows when each US president started and ended their term.
+
+```{r}
+presidential %>%
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id)) +
+    geom_point() +
+    geom_segment(aes(xend = end, yend = id)) +
+    scale_x_date(NULL, breaks = presidential$start, date_labels = "'%y")
+```
 
 ----
 
@@ -334,6 +347,18 @@ presidential %>%
     geom_point() +
     geom_segment(aes(xend = end, yend = id)) +
     scale_colour_manual(values = c(Republican = "red", Democratic = "blue"))
+```
+
+- the above plot can be improved
+
+```{r}
+presidential %>%
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id, colour = party)) +
+    geom_point() +
+    geom_segment(aes(xend = end, yend = id)) +
+    scale_colour_manual(values = c(Republican = "red", Democratic = "blue")) +
+    scale_x_date(NULL, breaks = presidential$start, date_labels = "'%y")
 ```
 
 ----
