@@ -1,7 +1,7 @@
 ---
 title: "Lab 04 ggplot2"
 author: "Dr. Xiang Ji @ Tulane University"
-date: "Oct 8, 2020"
+date: "Oct 8, 2021"
 output:
   html_document:
     toc: true
