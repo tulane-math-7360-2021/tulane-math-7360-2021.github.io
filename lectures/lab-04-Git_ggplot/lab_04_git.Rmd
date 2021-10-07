@@ -1,0 +1,118 @@
+---
+title: "Lab 04 Git"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Oct 8, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+## Some more Git exercise
+
+1. Please read about [git merge conflicts](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-merge-conflicts)
+
+2. Now read about [resolving a merge conflict using the command line](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line)
+
+3. Now let's create a merge conflict
+
+```{bash}
+# cd to your local git folder
+cd ~/GitFolders/Math-7360-Xiang-Ji
+
+# checkout master branch
+git checkout master
+
+# list files
+ls -lt
+
+# check git status
+git status
+
+# check branch
+git branch
+```
+
+```{bash}
+# git pull from remote server first
+git pull
+```
+
+Let's add what is inside `README.md` and add a new line to the end of the file
+
+```{bash}
+# new code chunk moves the working directory back
+# If you know a cleaner way, please let me know.
+cd ~/GitFolders/Math-7360-Xiang-Ji
+
+head README.md
+
+echo "Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!"$'\n' >> README.md
+
+# take a look again
+head README.md
+```
+
+Now let's commit this change to the master branch
+
+```{bash}
+cd ~/GitFolders/Math-7360-Xiang-Ji
+
+git status
+
+# see the difference
+git diff README.md
+
+git add README.md
+
+git commit -m 'add line about course webpage to readme'
+
+git push
+```
+
+And switch to `develop` branch, work on the same README.md file with different new line
+
+`$'\n'` adds a line break
+
+```{bash}
+cd ~/GitFolders/Math-7360-Xiang-Ji
+
+git checkout develop
+
+git pull
+
+git status
+
+git branch
+
+echo "This is our course [webpage](https://tulane-math7360.github.io/)!"$'\n' >> README.md
+
+git diff README.md
+
+git add README.md
+
+git commit -m 'add a different line for course webpage to readme on develop'
+
+git push
+
+```
+
+Now merge develop branch into master!
+
+```{bash}
+cd ~/GitFolders/Math-7360-Xiang-Ji
+
+git checkout master
+git pull
+```
+
+This should create a conflict for you.
+
+```{bash, eval=FALSE}
+git merge develop
+```
+
+> Please fix this merge conflict.
+

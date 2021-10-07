@@ -1,0 +1,68 @@
+---
+title: "Lab 04 ggplot2"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Oct 8, 2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library("tidyverse")
+```
+
+## Some exercise on ggplot2
+
+### Aesthetic mappings
+
+Q1. What's gone wrong with this code?
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, colour = "blue"))
+```
+
+------------
+
+Q2. Which variables in `mpg` are categorical? Which variables are continuous?
+(Hint: type `?mpg` to read the documentation for the dataset).
+How can you see this information when you run `mpg`?
+
+------------
+
+Q3. Map a continuous variable to `color`, `size`, and `shape`.
+How do these aesthetics behave differently for categorical vs. continuous variables?
+
+------------
+
+Q4. What happens if you map the same variable to multiple aesthetics?
+
+------------
+
+Q5. What happens if you map an aesthetic to something other than a variable name, like `aes(colour = displ < 5)`? Note, you’ll also need to specify `x` and `y`.
+
+------------
+
+### Geometric objects
+
+Q6. What geom would you use to draw a line chart? A boxplot? A histogram? An area chart?
+
+------------
+
+Q7. Will these two graphs look different? Why/why not?
+
+```{r, eval=FALSE}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  geom_smooth()
+
+ggplot() + 
+  geom_point(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_smooth(data = mpg, mapping = aes(x = displ, y = hwy))
+```
+
+> We will continue with ggplot exercise in next lab.
