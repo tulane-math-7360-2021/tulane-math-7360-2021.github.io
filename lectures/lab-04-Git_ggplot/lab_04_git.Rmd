@@ -87,7 +87,7 @@ git status
 
 git branch
 
-echo "This is our course [webpage](https://tulane-math-7360-2021.github.io/!"$'\n' >> README.md
+echo "This is our course [webpage](https://tulane-math-7360-2021.github.io/)!"$'\n' >> README.md
 
 git diff README.md
 
