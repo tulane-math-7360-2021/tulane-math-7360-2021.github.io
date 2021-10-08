@@ -188,7 +188,7 @@ pre code {
 cd ~/GitFolders/Math-7360-Xiang-Ji
 
 # checkout master branch
-git checkout master
+git checkout main
 
 # list files
 ls -lt
@@ -198,21 +198,20 @@ git status
 
 # check branch
 git branch</code></pre>
-<pre><code>## error: pathspec &#39;master&#39; did not match any file(s) known to git
+<pre><code>## Switched to branch &#39;main&#39;
+## Your branch is up to date with &#39;origin/main&#39;.
 ## total 8
-## drwxr-xr-x  4 xji3  staff  128 Sep 20 11:49 Lab_2
-## drwxr-xr-x  3 xji3  staff   96 Sep 15 11:49 hw1
-## -rw-r--r--  1 xji3  staff   58 Sep 15 11:36 README.md
-## On branch develop
-## Your branch is up to date with &#39;origin/develop&#39;.
+## -rw-r--r--  1 xji3  staff  140 Oct  7 21:59 README.md
+## On branch main
+## Your branch is up to date with &#39;origin/main&#39;.
 ## 
 ## Untracked files:
 ##   (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
 ##  .DS_Store
 ## 
 ## nothing added to commit but untracked files present (use &quot;git add&quot; to track)
-## * develop
-##   main</code></pre>
+##   develop
+## * main</code></pre>
 <pre class="bash"><code># git pull from remote server first
 git pull</code></pre>
 <pre><code>## Already up to date.</code></pre>
@@ -223,15 +222,19 @@ cd ~/GitFolders/Math-7360-Xiang-Ji
 
 head README.md
 
-echo &quot;Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!&quot;$&#39;\n&#39; &gt;&gt; README.md
+echo &quot;Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!&quot;$&#39;\n&#39; &gt;&gt; README.md
 
 # take a look again
 head README.md</code></pre>
 <pre><code>## # Math-7360-Xiang-Ji
 ## Math 7360 HW and Lab submission repo
+## Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+## 
 ## # Math-7360-Xiang-Ji
 ## Math 7360 HW and Lab submission repo
-## Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!</code></pre>
+## Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+## 
+## Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!</code></pre>
 <p>Now let’s commit this change to the master branch</p>
 <pre class="bash"><code>cd ~/GitFolders/Math-7360-Xiang-Ji
 
@@ -245,8 +248,8 @@ git add README.md
 git commit -m &#39;add line about course webpage to readme&#39;
 
 git push</code></pre>
-<pre><code>## On branch develop
-## Your branch is up to date with &#39;origin/develop&#39;.
+<pre><code>## On branch main
+## Your branch is up to date with &#39;origin/main&#39;.
 ## 
 ## Changes not staged for commit:
 ##   (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
@@ -259,18 +262,19 @@ git push</code></pre>
 ## 
 ## no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
 ## diff --git a/README.md b/README.md
-## index b576e6b..fe82fe6 100644
+## index 6136c37..3527889 100644
 ## --- a/README.md
 ## +++ b/README.md
-## @@ -1,2 +1,4 @@
-##  # Math-7360-Xiang-Ji
+## @@ -2,3 +2,5 @@
 ##  Math 7360 HW and Lab submission repo
-## +Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!
+##  Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+##  
+## +Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
 ## +
-## [develop bf5ba16] add line about course webpage to readme
+## [main 0fb0352] add line about course webpage to readme
 ##  1 file changed, 2 insertions(+)
 ## To https://github.com/tulane-math-7360-2021/Math-7360-Xiang-Ji.git
-##    8ca0d71..bf5ba16  develop -&gt; develop</code></pre>
+##    eca9f3f..0fb0352  main -&gt; main</code></pre>
 <p>And switch to <code>develop</code> branch, work on the same README.md file with different new line</p>
 <p><code>$&#39;\n&#39;</code> adds a line break</p>
 <pre class="bash"><code>cd ~/GitFolders/Math-7360-Xiang-Ji
@@ -283,7 +287,7 @@ git status
 
 git branch
 
-echo &quot;This is our course [webpage](https://tulane-math7360.github.io/)!&quot;$&#39;\n&#39; &gt;&gt; README.md
+echo &quot;This is our course [webpage](https://tulane-math-7360-2021.github.io/!&quot;$&#39;\n&#39; &gt;&gt; README.md
 
 git diff README.md
 
@@ -293,7 +297,7 @@ git commit -m &#39;add a different line for course webpage to readme on develop&
 
 git push
 </code></pre>
-<pre><code>## Already on &#39;develop&#39;
+<pre><code>## Switched to branch &#39;develop&#39;
 ## Your branch is up to date with &#39;origin/develop&#39;.
 ## Already up to date.
 ## On branch develop
@@ -307,25 +311,26 @@ git push
 ## * develop
 ##   main
 ## diff --git a/README.md b/README.md
-## index fe82fe6..c00ed02 100644
+## index c06a0f9..383caa6 100644
 ## --- a/README.md
 ## +++ b/README.md
-## @@ -2,3 +2,5 @@
-##  Math 7360 HW and Lab submission repo
-##  Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!
+## @@ -10,3 +10,5 @@ This is our course [webpage](https://tulane-math-7360-2021.github.io/!
 ##  
-## +This is our course [webpage](https://tulane-math7360.github.io/)!
+##  This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+##  
+## +This is our course [webpage](https://tulane-math-7360-2021.github.io/!
 ## +
-## [develop de7b529] add a different line for course webpage to readme on develop
+## [develop 87cb216] add a different line for course webpage to readme on develop
 ##  1 file changed, 2 insertions(+)
 ## To https://github.com/tulane-math-7360-2021/Math-7360-Xiang-Ji.git
-##    bf5ba16..de7b529  develop -&gt; develop</code></pre>
+##    e4b5779..87cb216  develop -&gt; develop</code></pre>
 <p>Now merge develop branch into master!</p>
 <pre class="bash"><code>cd ~/GitFolders/Math-7360-Xiang-Ji
 
-git checkout master
+git checkout main
 git pull</code></pre>
-<pre><code>## error: pathspec &#39;master&#39; did not match any file(s) known to git
+<pre><code>## Switched to branch &#39;main&#39;
+## Your branch is up to date with &#39;origin/main&#39;.
 ## Already up to date.</code></pre>
 <p>This should create a conflict for you.</p>
 <pre class="bash"><code>git merge develop</code></pre>

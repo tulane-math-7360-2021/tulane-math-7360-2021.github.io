@@ -23,7 +23,7 @@ csl: ../apa.csl
 cd ~/GitFolders/Math-7360-Xiang-Ji
 
 # checkout master branch
-git checkout master
+git checkout main
 
 # list files
 ls -lt
@@ -49,7 +49,7 @@ cd ~/GitFolders/Math-7360-Xiang-Ji
 
 head README.md
 
-echo "Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!"$'\n' >> README.md
+echo "Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!"$'\n' >> README.md
 
 # take a look again
 head README.md
@@ -87,7 +87,7 @@ git status
 
 git branch
 
-echo "This is our course [webpage](https://tulane-math7360.github.io/)!"$'\n' >> README.md
+echo "This is our course [webpage](https://tulane-math-7360-2021.github.io/!"$'\n' >> README.md
 
 git diff README.md
 
@@ -104,7 +104,7 @@ Now merge develop branch into master!
 ```{bash}
 cd ~/GitFolders/Math-7360-Xiang-Ji
 
-git checkout master
+git checkout main
 git pull
 ```
 
