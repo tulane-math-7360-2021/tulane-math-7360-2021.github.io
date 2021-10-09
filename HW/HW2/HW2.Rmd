@@ -1,0 +1,85 @@
+---
+title: "Math 7360 Homework #2"
+subtitle: "Due: Friday, Oct. 29, 2021"
+output:
+  html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Use tidyverse (ggplot2, dplyr) to explore the COVID-19 data for Louisiana.
+
+We will work with two datasets.
+The first [dataset](https://ldh.la.gov/Coronavirus/) is from Louisiana Department of Health where you can get three excel files for:
+
+- Cases and Testing Data by Parish by Day
+
+- Cases and Testing Data by Census Tract by Week
+
+- Cases by Age/Gender by Week
+
+The second [dataset](https://covidtracking.com/) is from the COVID Tracking Project where you can download two CSV files:
+
+- Daily case count data ["louisiana-history.csv"](https://covidtracking.com/data/state/louisiana)
+
+- Daily case data by race ["CRDT Data - CRDT.csv"](https://covidtracking.com/race/about#download-the-data)
+
+<!-- https://covidtracking.com/data/state/louisiana -->
+
+## Q1
+
+Summarize following objects using appropriate graphs:
+
+- Daily test counts by Parish
+
+- Daily Negative test counts by Parish
+
+- Daily Positive test counts by Parish
+
+- Weekly total case count by Age group
+
+- Weekly case count by Age group and Region
+
+- Weekly total case count by Gender
+
+- Weekly case count by Gender and Region
+
+- Weekly case count by Gender and Parish
+
+- Daily case count by Race group of **State LA**
+
+- Daily death count by Race group of **State LA**
+
+## Q2
+
+Link the daily case count data from the two sources.  Summarize your findings.
+
+## Q3
+
+Recreate the 4 plots (New tests, New cases, Current hospitalizations, and New deaths) of total daily case counts with 7-day average of Full range at [the COVID tracking project website](https://covidtracking.com/data/state/louisiana)
+
+## Q4
+
+Compile a tibble that contains cumulative percent positivity of tests by Parish.
+
+Plot the **cumulative** percent positivity of tests of Parish on a map for the weeks containing dates (one plot for each week):
+
+- March 22, 2020 (stay at home order starts)
+
+- May 15, 2020   (stay at home order lifted, phase 1 starts)
+
+- June 5, 2020   (phase 2 starts)
+
+- July 13, 2020  (Mask mandate)
+
+- January 1, 2021 (New Year's eve within holiday season)
+
+- January 10, 2021 (Peak of new cases across US)
+
+## Q5
+
+Plot new cases by lab collection date with a 7-day average line of New Orleans and Baton Rouge.
+
+Explain your findings.
