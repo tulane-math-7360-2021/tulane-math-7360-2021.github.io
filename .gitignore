@@ -8,3 +8,7 @@ _site/
 
 # R related
 *.Rhistory
+
+# Student Repos
+git_repos
+
