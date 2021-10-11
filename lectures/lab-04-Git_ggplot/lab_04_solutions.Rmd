@@ -1,0 +1,120 @@
+---
+title: "Lab 04 solutions"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Oct 11, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+## Some more Git exercise
+
+The merge conflict looks like the lines below:
+
+```{bash, eval = FALSE}
+<<<<<<< HEAD
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+=======
+Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!
+
+This is our course [webpage](https://tulane-math7360.github.io/)!
+
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/)!
+
+>>>>>>> develop
+
+```
+
+The two blocks
+
+```{bash, eval = FALSE}
+<<<<<<< HEAD
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+=======
+```
+
+and 
+
+```{bash, eval = FALSE}
+=======
+Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!
+
+This is our course [webpage](https://tulane-math7360.github.io/)!
+
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/)!
+
+>>>>>>> develop
+```
+contain the regions that is modified on both branches.
+You will need to choose one to keep to solve this merge conflict.
+
+For example, if we want to keep what's in develop, we would delete the chunk with `HEAD`
+and also the arrow with develop to keep what's originally in the file on the develop branch.
+
+The whole chunk after this operation simply reads as
+
+```{bash, eval = FALSE}
+Our course webpage is on [GitHub](https://tulane-math7360.github.io/) too!
+
+This is our course [webpage](https://tulane-math7360.github.io/)!
+
+Our course webpage is on [GitHub](https://tulane-math-7360-2021.github.io/) too!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/!
+
+This is our course [webpage](https://tulane-math-7360-2021.github.io/)!
+
+```
+
+
+------------------------------
+
+## ggplot2 exercise
+
+Reference: [r4ds solutions](https://jrnold.github.io/r4ds-exercise-solutions/data-visualisation.html#aesthetic-mappings)
+
+Question mapping:
+
+|  Lab Question | r4ds exercise |
+| ------------- | ------------- |
+| Q1 | [Exercise 3.3.1](https://jrnold.github.io/r4ds-exercise-solutions/data-visualisation.html#aesthetic-mappings) |
+| Q2 | [Exercise 3.3.2](https://jrnold.github.io/r4ds-exercise-solutions/data-visualisation.html#aesthetic-mappings) |
+| Q3 | [Exercise 3.3.3](https://jrnold.github.io/r4ds-exercise-solutions/data-visualisation.html#aesthetic-mappings) |
+| Q4 | [Exercise 3.3.4](https://jrnold.github.io/r4ds-exercise-solutions/data-visualisation.html#aesthetic-mappings) |
+| Q5 | [Exercise 3.3.6](https://jrnold.github.io/r4ds-exercise-solutions/data-visualisation.html#aesthetic-mappings) |
+| Q6 | [Exercise 3.6.1](https://jrnold.github.io/r4ds-exercise-solutions/data-visualisation.html#geometric-objects)  |
+| Q7 | [Exercise 3.6.5](https://jrnold.github.io/r4ds-exercise-solutions/data-visualisation.html#geometric-objects)  |
+
