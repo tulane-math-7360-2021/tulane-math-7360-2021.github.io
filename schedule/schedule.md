@@ -32,6 +32,7 @@ Topics:
 | **09/20** Data structure [[Rmd](../lectures/06-Data_structure/Data_Structure.Rmd)][[HTML](../lectures/06-Data_structure/Data_Structure.html)] | **09/22** Functions [[Rmd](../lectures/07-Functions/Functions.Rmd)][[HTML](../lectures/07-Functions/Functions.html)]  | **09/24** Fall Break! | |
 | **09/27** Advanced R programming [[Rmd](../lectures/08-R_programming/advr.Rmd)][[HTML](../lectures/08-R_programming/advr.html)] | **09/29** Tibble [[Rmd](../lectures/09-Tidy/Tidy.Rmd)][[HTML](../lectures/09-Tidy/Tidy.html)] | **10/01** Lab 3 [[Rmd](../lectures/lab-03-Functions/lab_03_Functions.Rmd)][[HTML](../lectures/lab-03-Functions/lab_03_Functions.html)] | |
 | **10/04** Tibble (cont.) [[Rmd](../lectures/09-Tidy/Tidy.Rmd)][[HTML](../lectures/09-Tidy/Tidy.html)] <br> ggplot2 [[Rmd](../lectures/10-ggplot2/ggplot2.Rmd)][[HTML](../lectures/10-ggplot2/ggplot2.html)] | **10/06** ggplot2 [[Rmd](../lectures/10-ggplot2/ggplot2_2.Rmd)][[HTML](../lectures/10-ggplot2/ggplot2_2.html)]| **10/08** Lab 4 Git [[Rmd](../lectures/lab-04-Git_ggplot/lab_04_git.Rmd)][[HTML](../lectures/lab-04-Git_ggplot/lab_04_git.html)] <br> ggplot [[Rmd](../lectures/lab-04-Git_ggplot/lab_04_ggplot2.Rmd)][[HTML](../lectures/lab-04-Git_ggplot/lab_04_ggplot2.html)] | HW2 [[Rmd](../HW/HW2/HW2.Rmd)][[HTML](../HW/HW2/HW2.html)]  |
+| **10/11** Visualizing Longitudinal data [[Rmd](../lectures/10-ggplot2/longitudinal.Rmd)][[HTML](../lectures/10-ggplot2/longitudinal.html)] | | | |
 | **11/22** Thanksgiving Holiday |  **11/24** Thanksgiving Holiday |  **11/26** Thanksgiving Holiday | |
 
 
