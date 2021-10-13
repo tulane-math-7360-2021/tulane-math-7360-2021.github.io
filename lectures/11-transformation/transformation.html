@@ -173,6 +173,7 @@ pre code {
 
 <div id="TOC">
 <ul>
+<li><a href="#announcement">Announcement</a></li>
 <li><a href="#acknowledgement">Acknowledgement</a></li>
 <li><a href="#nycflights13-data">nycflights13 data</a></li>
 <li><a href="#dplyr-basics">dplyr basics</a></li>
@@ -199,6 +200,16 @@ pre code {
 </ul>
 </div>
 
+<div id="announcement" class="section level2">
+<h2>Announcement</h2>
+<ul>
+<li><p>Remember to cite your data source.</p>
+<ul>
+<li><p>A web link is less stable, but works for the course project</p></li>
+<li><p>Cite the original publication</p></li>
+</ul></li>
+</ul>
+</div>
 <div id="acknowledgement" class="section level2">
 <h2>Acknowledgement</h2>
 <p>Dr. Hua Zhou’s <a href="https://ucla-biostat203b-2020winter.github.io/slides/07-dplyr/dplyr.html">slides</a></p>
@@ -458,16 +469,16 @@ filter(df, x &gt; 1)</code></pre>
 <pre><code>## # A tibble: 10 × 19
 ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-##  1  2013     5    23     1903           1610       173     2052           1751
-##  2  2013     9    23      630            630         0      840            848
-##  3  2013     1    14      928            921         7     1042           1029
-##  4  2013     4     5     1735           1721        14     1900           1858
-##  5  2013     1    11     1600           1600         0     1842           1912
-##  6  2013     9     9      951            959        -8     1156           1207
-##  7  2013     1     2     1239           1220        19     1328           1320
-##  8  2013     2    26        6           2250        76      109              5
-##  9  2013    10    21      926            929        -3     1215           1234
-## 10  2013     6    26      657            700        -3     1044            833
+##  1  2013    11    20     2038           2048       -10     2244           2319
+##  2  2013    11    14      747            754        -7      850            911
+##  3  2013     9    18     1308           1300         8     1543           1555
+##  4  2013     7    28     1628           1615        13     2042           1933
+##  5  2013     6    25     2104           1955        69     2309           2145
+##  6  2013     3    24     2259           2000       179      218           2335
+##  7  2013    12    15      956            959        -3     1237           1244
+##  8  2013     5    19     2133           1930       123     2344           2139
+##  9  2013     5    23     1815           1723        52     2213           1943
+## 10  2013     4     3     1952           1959        -7     2230           2303
 ## # … with 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
 ## #   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
 ## #   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre></li>
@@ -479,16 +490,16 @@ filter(df, x &gt; 1)</code></pre>
 <pre><code>## # A tibble: 33,677 × 19
 ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-##  1  2013     1    13     2158           2159        -1     2302           2316
-##  2  2013    11     3      957           1000        -3     1238           1245
-##  3  2013     7    19      746            755        -9      927            955
-##  4  2013    12     8     1802           1629        93     2017           1759
-##  5  2013     3    27      800            804        -4      856            914
-##  6  2013     4    23      956           1000        -4     1333           1334
-##  7  2013     9    17      749            750        -1     1031           1049
-##  8  2013     6    30      805            805         0     1026           1014
-##  9  2013    11    10      954            959        -5     1102           1116
-## 10  2013     5     7      820            830       -10      929           1015
+##  1  2013     3    28     1841           1815        26     2035           2036
+##  2  2013     6    27      827            829        -2     1013           1028
+##  3  2013     5     3      655            700        -5      936           1016
+##  4  2013    11    22     1709           1710        -1     1901           1911
+##  5  2013     2    19     1804           1805        -1     1946           1955
+##  6  2013     3    13     1738           1745        -7     1907           1929
+##  7  2013     8    31     1911           1830        41     2145           2140
+##  8  2013     3     7     1255           1259        -4     1432           1456
+##  9  2013    12     9      757            759        -2     1028           1034
+## 10  2013     5     8     1440           1435         5     1733           1710
 ## # … with 33,667 more rows, and 11 more variables: arr_delay &lt;dbl&gt;,
 ## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
 ## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre></li>

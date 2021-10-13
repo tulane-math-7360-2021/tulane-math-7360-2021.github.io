@@ -15,6 +15,14 @@ knitr::opts_chunk$set(fig.align = 'center')
 sessionInfo()
 ```
 
+## Announcement
+
+- Remember to cite your data source.  
+  
+  - A web link is less stable, but works for the course project
+  
+  - Cite the original publication
+
 ## Acknowledgement
 
 Dr. Hua Zhou's [slides](https://ucla-biostat203b-2020winter.github.io/slides/07-dplyr/dplyr.html)
