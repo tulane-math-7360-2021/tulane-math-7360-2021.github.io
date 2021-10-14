@@ -1,0 +1,137 @@
+---
+title: "Lab 06 keys"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Sep 25, 2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library("tidyverse")
+```
+
+## Some more exercise on ggplot2
+
+### embed a plot inside another
+
+In this part, we want to replicate the plots in [reference](https://www.r-bloggers.com/2019/02/plots-within-plots-with-ggplot2-and-ggmap/).
+
+1.  create the data and do the initial visualization
+
+```{r}
+set.seed(42)
+n <- 1000
+x <- runif(n) * 3
+y <- x * sin(1/x) + rnorm(n) / 25
+df <- tibble(x = x, y = y)
+p1 <- ggplot(df, aes(x, y)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(se = FALSE) +
+  theme_bw()
+p1
+```
+
+Let's further take a look over the function $f(x) = x \sin(\frac{1}{x})$.
+
+Create a new variable $z$ to store the $f(x)$ values at each $x$ point.
+
+```{r}
+df.with.z <- df %>%
+  add_column(z = x * sin(1 / x))
+```
+
+Now plot another figure with two layers:
+
+- Scatter plot of the points (x, y)
+
+- A line by (x, z)
+
+Put your code inside the code block, explain your findings outside the code block (so that it renders to text in the HTML file).
+
+You may want to change `eval = TRUE` or remove it for the code to be executed.
+
+```{r}
+p2 <- ggplot(df.with.z, mapping = aes(x = x, y = y)) + 
+  geom_point(alpha = 0.3) +
+  geom_line(mapping = aes(x = x, y = z), color = "red", linetype = "dotted") +
+  theme_bw()
+p2
+```
+
+Now we see that the default smoothing function doesn't catch the beginning part of these points.
+
+Let's zoom in (with clipping) the region $x \in [0, 0.5]$ and make another plot.
+
+
+
+```{r}
+p3 <- ggplot(df, aes(x, y)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(se = FALSE) +
+    scale_x_continuous(limits = c(0, 0.5)) +
+    scale_y_continuous(limits = c(-0.3, 0.6)) +
+    theme_bw()
+p3
+```
+
+Now embed p3 inside p1.
+
+Please add appropriate titles and subtitles to them.
+
+```{r}
+p1 + annotation_custom(ggplotGrob(p3), xmin = 1, xmax = 3, ymin = -0.3, ymax = 0.6)
+```
+
+------------------------------------
+
+Now please follow the second half of the [reference](https://www.r-bloggers.com/2019/02/plots-within-plots-with-ggplot2-and-ggmap/), but instead create a UK map similar to [this one](https://geology.com/world/united-kingdom-satellite-image.shtml) and save it as **uk_map.pdf**
+
+Hint: it's time to practice your self-learning (google?) skills.
+
+<p align="center">
+<img src="./united-kingdom-map.gif" height="600">
+<br>
+<em>Target UK map</em>
+</p>
+
+
+<p align="center">
+<img src="./a_bad_UK_map_example.png" height="600">
+<br>
+<em>A bad map your instructor created.</em>
+</p>
+
+```{r}
+# Your code for the UK map
+library(ggmap)
+
+uk_bbox <- c(left = -12, bottom = 49.8, right = 2, top = 60.15456)
+uk_main_map <- get_stamenmap(uk_bbox, zoom = 6, maptype = "terrain")
+p_main <- ggmap(uk_main_map) +
+  xlab("longitude") +
+  ylab("Latitude") +
+  scale_x_continuous(breaks = c(-8, -4, 0), labels = c("8°W", "4°W", "0"))
+  theme(axis.text = element_text(size = 16),
+        axis.title = element_text(size = 24, face = "bold"))
+p_main
+
+shetland_bbox <- c(left = -2.3, bottom = 59.5, right = -0.5, top = 61.2)
+shetland_map <- get_stamenmap(shetland_bbox, zoom = 7, maptype = "terrain") 
+p_shetland<- ggmap(shetland_map) + 
+    # labs(title = "Shetland Islands") +
+    theme(axis.title = element_blank(), 
+          axis.text  = element_blank(),
+          axis.ticks = element_blank())
+p_shetland
+
+library(grid)
+
+p_main +
+  inset(ggplotGrob(p_shetland), xmin = -7.8, xmax = -11.8, ymax = 60.1, ymin = 56.0)
+ggsave("a_bad_UK_map_example.png", height = 10, width = 8, dpi = "retina")
+```
