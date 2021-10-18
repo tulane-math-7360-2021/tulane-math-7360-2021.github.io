@@ -14,7 +14,42 @@ csl: ../apa.csl
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width=5, fig.height=3.5, fig.align='center', cache=FALSE)
 rm(list = ls()) # clean-up workspace
+library(tidyverse)
+sessionInfo()
 ```
+
+# Announcement
+
+- Oliver's question from last lecture: how to supply arguments to functions inside `across`
+
+  - Take a look at the documentation of `across` [here](https://dplyr.tidyverse.org/reference/across.html)
+  
+  - Notice the `...` and the `.fns` input formats
+  
+    - A purrr-style lambda (?), e.g. `~ mean(.x, na.rm = TRUE)`
+    
+    - `purrr` package [documentation](https://purrr.tidyverse.org/articles/other-langs.html)
+    
+    - Anonymous functions are verbose in R, so we provide two convenient shorthands.
+    
+      - For unary functions,`~ .x + 1` is equivalent to `function(.x) .x + 1`.
+      
+      - For chains of transformations functions, `. %>% f() %>% g()` is equivalent to `function(.) . %>% f() %>% g()` (this shortcut is provided by magrittr).
+    
+    ```{r}
+    library(nycflights13)
+    test.case.1 <- flights %>%
+      transmute(across(1:4, list(log = log, log2 = log2)))
+    
+    test.case.2 <- flights %>%
+      transmute(across(1:4, list(log = log, log.2.base = ~ log(.x, base = 2))))
+    
+    test.case.3 <- flights %>%
+      transmute(across(1:4, list(log = log, log.2.base = function(.x) log(.x, base = 2))))
+    
+    all(test.case.1 == test.case.2, na.rm = TRUE)
+    all(test.case.1 == test.case.3, na.rm = TRUE)
+    ```
 
 # String | r4ds chapter 14
 
