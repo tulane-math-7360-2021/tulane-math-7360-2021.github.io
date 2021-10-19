@@ -35,6 +35,20 @@ sessionInfo()
       - For unary functions,`~ .x + 1` is equivalent to `function(.x) .x + 1`.
       
       - For chains of transformations functions, `. %>% f() %>% g()` is equivalent to `function(.) . %>% f() %>% g()` (this shortcut is provided by magrittr).
+
+- HW2 questions
+
+  - For problem 2 of Homework 2, are the two datasets we need to link “Louisiana-history.csv” and “CRDT Data -CRDT.csv”? Also, does linking mean combining the two datasets or just plotting them on the same graph for comparison?
+    
+    - No, the two datasets refer to the two data sources: (1) Louisiana Department of Health (2) The COVID tracking project
+    
+    - Both data sources have daily counts.  Please compare them with whatever visualization methods you see fit.
+    
+  - ...about Q3, the question says that “Recreate the 4 plots with 7-day average of Full range”, does this mean that I need to create a new table transfer the “by day” data to “by week”? Or there already have the dataset on website I can use.
+  
+    - Presumably, you should have the same amount of information as in the figures from the downloaded files.  The question is asking you to present the information in the same fashion as on the website.  I expect you to find answers about using "by day" or "by week" summaries through investigating the four figures, after all, you are asked to recreate them.
+    
+    - There are choices for "State-level Metrics" (Total vs Per 1M people, Last 90 days vs Historical).  Feel free to pick one (enough for the homework) or several or all combinations for your plots.
     
     ```{r}
     library(nycflights13)
