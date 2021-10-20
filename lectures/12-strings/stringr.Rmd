@@ -161,6 +161,8 @@ for a complete list.
 
 ## Combining strings
 
+- Read `str_c`'s [documentation](https://www.rdocumentation.org/packages/stringr/versions/1.4.0/topics/str_c)
+
 - Combine two or more strings
     ```{r}
     str_c("x", "y")
@@ -201,6 +203,8 @@ for a complete list.
     ```
     
 ## Subsetting strings
+
+- `str_sub`'s [documentation](https://www.rdocumentation.org/packages/stringr/versions/1.4.0/topics/str_sub)
 
 - By position:
     ```{r}
@@ -263,11 +267,13 @@ for a complete list.
     ```
 
 <p align="center">
-<img src="./escape.png" height="75">
+<img src="./escape.png" height="300">
 </p>
 
 
 ## Anchors
+
+- List of typographical symbols and punctuation marks [wikipedia](https://en.wikipedia.org/wiki/List_of_typographical_symbols_and_punctuation_marks)
 
 - `^` matches the start of the string:
     ```{r}
