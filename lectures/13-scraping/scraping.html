@@ -460,7 +460,8 @@ url &lt;- &quot;http://www.imdb.com/search/title?count=100&amp;release_date=2019
 <div id="title" class="section level3">
 <h3>Title</h3>
 <ul>
-<li><p>Use SelectorGadget to find the CSS selector <code>.lister-item-header a</code>.</p>
+<li><p>Use SelectorGadget to find the CSS selector <code>.lister-item-header a</code>.</p></li>
+<li><p><a href="https://www.w3schools.com/cssref/css_selectors.asp">CSS selector reference</a></p>
 <pre class="r"><code># Using CSS selectors to scrap the title section
 (title_data_html &lt;- html_nodes(webpage, &#39;.lister-item-header a&#39;))</code></pre>
 <pre><code>## {xml_nodeset (100)}

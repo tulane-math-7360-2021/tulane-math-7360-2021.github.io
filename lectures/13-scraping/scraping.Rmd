@@ -204,6 +204,8 @@ There is a wealth of data on internet. How to scrape them and analyze them?
 ### Title
 
 - Use SelectorGadget to find the CSS selector `.lister-item-header a`.
+
+- [CSS selector reference](https://www.w3schools.com/cssref/css_selectors.asp)
     ```{r}
     # Using CSS selectors to scrap the title section
     (title_data_html <- html_nodes(webpage, '.lister-item-header a'))
