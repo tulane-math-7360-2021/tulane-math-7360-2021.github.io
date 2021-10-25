@@ -12,3 +12,8 @@ _site/
 # Student Repos
 git_repos
 
+# cache and files
+*_cache/
+*_files/
+
+
