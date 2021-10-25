@@ -1,0 +1,49 @@
+---
+title: "Lab 07 stringr keys"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Oct 25, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library("tidyverse")
+```
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library("tidyverse")
+library(pdftools)
+
+UC_text <- pdf_text("./gisaid_id_table.pdf") %>%
+  readr::read_lines()
+```
+
+Now remove the first three rows and transform the rest into a table
+
+```{r}
+all.info.lines <- UC_text[-(1:3)] %>%
+  str_squish()  # str_squish(all.info.lines)
+```
+
+Since we only care about the EPI ids, we only select them with a match of "EPI"
+
+```{r}
+all.info.lines <- all.info.lines[str_detect(all.info.lines, "EPI")]
+
+all.ids <- str_extract_all(str_split(all.info.lines, " "), "(EPI_ISL_)(\\d{4,8})") %>%
+  unlist()
+
+all.ids
+```
+
+Now output IDs to a file
+
+```{r}
+write_csv(tibble(EPI_id = all.ids), "./EPI_ids.txt")
+```
