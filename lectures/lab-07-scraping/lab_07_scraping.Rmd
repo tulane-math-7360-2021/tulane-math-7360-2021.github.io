@@ -1,0 +1,62 @@
+---
+title: "Lab 07 web scraping"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Oct 29, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+### HTML scraping
+
+We will scrape NFL data in this lab.
+
+We will follow [this tutorial](https://towardsdatascience.com/scraping-nfl-stats-to-compare-quarterback-efficiencies-4989642e02fe) on scraping NFL stats (although the tutorial uses python).
+
+We want to scrape from the webpage of [https://www.pro-football-reference.com/years/2019/passing.htm](https://www.pro-football-reference.com/years/2019/passing.htm)
+
+Now open html with rvest
+
+```{r}
+rm(list = ls()) # clean-up workspace
+```
+
+### Parse the table
+
+Inspect the table elements and try to find the patterns you can use to make the CSS selector for fetching the rows of the table
+
+
+The [CSS selector reference](https://www.w3schools.com/cssref/css_selectors.asp) could be helpful here.
+
+### Get column names
+
+Find the CSS selector for the title row of the table.  Is it an element of `thead`?
+
+Now get all the column names passing elements inside the `thead` element.
+
+```{r, eval = FALSE}
+# complete your code for getting the column names
+col_names
+```
+
+### get each row of the table
+
+Now find the CSS selector for each row of the table.
+
+For example, one possible rule your instructor found is to look for all the \<tr\> tags inside the \<tbody\> element.
+
+Hint: CSS selector `[target=_blank]` selects all elements with target="_blank".
+
+What does the CSS selector `[data-stat=age]` select?
+
+
+```{r, eval = FALSE}
+
+# Finish your code for scraping the whole table
+
+```
+
+You may refer to the "NFL_passing_2019.csv" file which contains the scraped data by your instructor.

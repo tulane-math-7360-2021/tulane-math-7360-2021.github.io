@@ -1,0 +1,92 @@
+---
+title: "Lab 08 web scraping"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Oct 9, 2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+
+### HTML scraping
+
+We will scrape NFL data in this lab.
+
+We will follow [this tutorial](https://towardsdatascience.com/scraping-nfl-stats-to-compare-quarterback-efficiencies-4989642e02fe) on scraping NFL stats (although the tutorial uses python).
+
+We want to scrape from the webpage of [https://www.pro-football-reference.com/years/2019/passing.htm](https://www.pro-football-reference.com/years/2019/passing.htm)
+
+Now open html with rvest
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library(tidyverse)
+library(rvest)
+url <- "https://www.pro-football-reference.com/years/2019/passing.htm"
+(webpage <- read_html(url))
+```
+
+### Parse the table
+
+Inspect the table elements and try to find the patterns you can use to make the CSS selector for fetching the rows of the table
+
+
+The [CSS selector reference](https://www.w3schools.com/cssref/css_selectors.asp) could be helpful here.
+
+### Get column names
+
+Find the CSS selector for the title row of the table.  Is it an element of `thead`?
+
+Now get all the column names passing elements inside the `thead` element.
+
+```{r}
+(col_names_html <- html_nodes(webpage, "thead"))
+col_names <- html_text(col_names_html) %>%
+  str_replace_all(c("\n" = "", "\\s+" = " ", "\"" = "")) %>%
+  str_split(" ") %>%
+  unlist() %>%
+  print()
+
+# I will just manually remove the last empty element
+(col_names <- col_names[-length(col_names)])
+```
+
+### get each row of the table
+
+Now find the CSS selector for each row of the table.
+
+For example, one possible rule your instructor found is to look for all the \<tr\> tags inside the \<tbody\> element.
+
+
+```{r}
+# prepare patterns first
+data_stat_names <- col_names %>%
+  str_to_lower()
+data_stat_names[c(1, 3, 8)] = c("ranker", "team", "qb_rec")
+data_stat_names[9:16] <- str_c("pass", str_replace(data_stat_names[9:16], "%", "_perc"), sep = "_")
+data_stat_names[17:23] <- str_c("pass", c("first_down", "long", "yds_per_att", "adj_yds_per_att", "yds_per_cmp", "yds_per_g", "rating"), sep = "_")
+data_stat_names[25:29] <- str_c("pass", c("sacked", "sacked_yds", "net_yds_per_att", "adj_net_yds_per_att", "sacked_perc"), sep = "_")
+data_stat_names[30] <- "comebacks"
+print(data_stat_names)
+
+
+# Now use the CSS selectors to scrape data and store them in a matrix
+scraped_data <- NULL
+for (stat_name in data_stat_names) {
+  col_pattern <- str_c('[data-stat=', stat_name, ']', sep = "")
+  (col_data_html <- html_nodes(webpage, str_c("tbody tr ", col_pattern, sep = "")))
+  col_data <- html_text(col_data_html)
+  scraped_data <- cbind(scraped_data, col_data)
+}
+colnames(scraped_data) <- col_names
+
+scraped_data <- as_tibble(scraped_data) %>%
+  filter(Rk != "Rk")
+scraped_data
+
+write_csv(scraped_data, "./NFL_passing_2019.csv")
+```
+
