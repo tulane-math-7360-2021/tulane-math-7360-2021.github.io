@@ -1,0 +1,603 @@
+---
+title: "Logistic Regression"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Nov 3, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+```{r}
+rm(list = ls()) # clean-up workspace
+library(tidyverse)
+library(faraway)
+sessionInfo()
+```
+
+## Announcement
+
+- Mid-term report (2 - 4 pages) by the end of week 12, [reference lecture note](https://tulane-math-7360-2021.github.io/lectures/01-intro/intro.html)
+
+- Presentation order:
+
+```{r, warning = FALSE}
+set.seed(7360)
+students <- c("Daniela-Florez", "Cong-Zhao", "Viraj-Puri", "Nadim-Hashmeh", 
+              "Danting-Li", "Zhipeng-Chen", "Abigail-Zion", "Haoqi-Chen",
+              "Christian-Frederiksen", "Zehao-Wang", "Alan-Braeley", "Keyan-Chen",
+              "Jose-Silvestre", "Rebekah-Albach", "Travis-McDonald", "Haiyu-Niu",
+              "Yuwei-Bao", "Oliver-Orejola", "Paul-Pluscht") %>%
+  sample() %>%
+  matrix(4, 5, byrow = TRUE, dimnames = list(c("1st", "2nd", "3rd", "4th"),
+                                             c("Dec 10", "Dec 13", "Dec 15", "Dec 17", "Dec 20"))) %>%
+  as_tibble(rownames = NA)
+students[4, 5] <- ""
+print(students)
+```
+
+- You could switch with your classmates for presentation date/order
+
+- 12 min presentation (10 min talk + 2 min questions)
+
+  - all on zoom to save transition time
+
+- I see nobody graduating this semester, confirm (?).
+
+  - Final report due 01/03/2022
+
+
+## Acknowledgement
+
+Dr. Hua Zhou's [slides](https://ucla-biostat-200c-2020spring.github.io/slides/03-binary/binary.html)
+
+## Heart disease example
+
+The dataframe `wcgs` in `faraway` package contains data from the Western Collaborative Group Study.
+```{r}
+wcgs %>% head(10)
+```
+We convert the dataframe into a tibble for compatibility with tidyverse.
+```{r}
+wcgs <- wcgs %>% 
+  as_tibble() %>%
+  print(width = Inf)
+```
+
+For now, we focus just on variables   
+    - `chd`, whether the person develops coronary heard disease or not,  
+    - `height`, height of the person in inches,   
+    - `cigs`, number of cigarettes smoked per day.  
+```{r}
+wcgs %>%
+  select(chd, height, cigs) %>%
+  summary()
+```
+
+We use side-by-side boxplots to summarize the qulitative variable `chd` and quantitative variables `height` and `cigs`
+```{r}
+ggplot(data = wcgs) +
+  geom_boxplot(mapping = aes(x = chd, y = height))
+```
+and number of cigarretes smoked per day 
+```{r}
+ggplot(data = wcgs) +
+  geom_boxplot(mapping = aes(x = chd, y = cigs))
+```
+
+It seems more cigarettes is associated with heard disease, but not height.  How can we formally analyze this? If we use linear regression (straight line) for the anlaysis, the line will eventually extends beyond the [0, 1] range, making interpretation hard. 
+```{r}
+ggplot(data = wcgs) +
+  geom_point(mapping = aes(x = cigs, y = chd))
+```
+
+## Logistic regression
+
+- Bernoulli model for a binary response
+$$
+Y_i = \begin{cases}
+1 & \text{with probability } p_i \\
+0 & \text{with probability } 1 - p_i
+\end{cases}
+$$
+
+- The parameter $p_i = \mathbb{E}(Y_i)$ will be related to the predictors $X_1, \ldots, X_{q}$ via an **inverse link function**
+$$
+p_i = \frac{e^{\eta_i}}{1 + e^{\eta_i}},
+$$
+where $\eta_i$ is the **linear predictor** or **systematic component**
+$$
+\eta_i = \beta_0 + \beta_1 x_{i1} + \cdots + \beta_{q} x_{iq} = \mathbf{x}_i^T \boldsymbol{\beta}
+$$
+with
+$$
+\boldsymbol{\beta} = \begin{pmatrix} \beta_0 \\ \beta_1 \\ \vdots \\ \beta_q \end{pmatrix}, \quad \mathbf{x}_i = \begin{pmatrix} 1 \\ x_{i1} \\ \vdots \\ x_{iq} \end{pmatrix}.
+$$
+
+- The function
+$$
+\eta = g(p) = \log \left( \frac{p}{1-p} \right)
+$$
+that links $\mathbb{E}(Y)$ to the systematic component is called the **link function**. This particular link function is also called the **logit function**.
+
+- The function 
+$$
+p = g^{-1}(\eta) = \frac{e^\eta}{1 + e^\eta}
+$$
+is called the **inverse link function**. This particular function (inverse logit) is also called the **logistic function**. A graph of the logistic function:
+```{r}
+ggplot(data = tibble(x = 0), mapping = aes(x = x)) + # null data
+  stat_function(fun = ilogit) + # ilogit is from faraway
+  xlim(-6, 6) + 
+  labs(x = expression(eta), y = "p", title = "Logistic function (inverse link)")
+# curve(ilogit(x), -6, 6, xlab = expression(eta), ylab = "p")
+```
+
+- Therefore above model is called the **logistic regression**.  
+
+## Fitting logistic regression
+
+- We use **method of maximum likelihood** (MLE) to estimate the parameters $\beta_0, \ldots, \beta_q$. 
+
+- Given $n$ data points $(y_i, \mathbf{x}_i)$, $i=1,\ldots,n$, the **log-likelihood** is
+\begin{eqnarray*}
+\ell(\boldsymbol{\beta}) &=& \sum_i \log \left[p_i^{y_i} (1 - p_i)^{1 - y_i}\right] \\
+&=& \sum_i \left[ y_i \log p_i + (1 - y_i) \log (1 - p_i) \right] \\
+&=& \sum_i \left[ y_i \log \frac{e^{\eta_i}}{1 + e^{\eta_i}} + (1 - y_i) \log \frac{1}{1 + e^{\eta_i}}  \right] \\
+&=& \sum_i \left[ y_i \eta_i - \log (1 + e^{\eta_i}) \right] \\
+&=& \sum_i \left[ y_i \cdot \mathbf{x}_i^T \boldsymbol{\beta} - \log (1 + e^{\mathbf{x}_i^T \boldsymbol{\beta}}) \right].
+\end{eqnarray*}
+
+- Maximization of this log-likehood function can be carried out by the Newton-Raphson (also known as Fisher scoring) algorithm.
+```{r}
+(lmod <- glm(chd ~ height + cigs, family = binomial, wcgs))
+```
+
+Summary of the result:
+```{r}
+(lmod_sm <- summary(lmod))
+```
+
+## Interpretation
+
+- **Exercise**: Before we attempt to interpret the results from logistic regression, we first need to understand how the data are transformed to $(y_i, \mathbf{x}_i)$.
+```{r}
+# dataframe
+wcgs %>%
+  select(chd, height, cigs) %>%
+  head(10)
+# response
+lmod$y %>% head(10)
+# predictors
+model.matrix(lmod) %>% head(10)
+```
+
+- How to interpret the regression coefficients in logistic regression? Remember
+$$
+\log \left( \frac{p}{1-p} \right) = \beta_0 + \beta_1 \cdot \text{height} + \beta_2 \cdot \text{cigs}. 
+$$
+The quantity
+$$
+o = \frac{p}{1-p}
+$$
+is called **odds** (of an event). 
+
+    Therefore $\beta_1$ can be interpreted as a unit increase in $x_1$ with $x_2$ held fixed increases the **log-odds** of success by $\beta_1$, or increase the odds of success by a factor of $e^{\beta_1}$. 
+
+- The `gtsummary` package presents regression results in a much nicer way that facilitates interpretation. Summarize the log-odds:
+```{r}
+library(gtsummary)
+lmod %>%
+  tbl_regression() %>%
+  bold_labels() %>%
+  bold_p(t = 0.05)
+```
+Summarize the odds:
+```{r}
+lmod %>%
+  tbl_regression(intercept = TRUE, exponentiate = TRUE) %>%
+  bold_labels() %>%
+  bold_p(t = 0.05)
+```
+    
+- **Exercise**: Interpret the regression coefficients from `wcgs` fit.  
+```{r}
+# same as lmod$coefficients
+# coef(lmod) is a named numeric vector
+(beta_hat <- unname(coef(lmod)))
+exp(beta_hat)
+```
+How to interpret the effect of a pack a day (20 cigarettes) on heart disease?
+```{r}
+exp(beta_hat[3] * 20)
+```
+
+- Suppose the probability of success in the presence of some condition is $p_1$ and $p_2$ in its absence. The **relative risk** or **risk ratio** is $p_1 / p_2$. For example, the predicted probability of a 68in tall person who smokes a pack (20 cigarettes) a day and who does not smoke are, respectively
+```{r}
+(p1 <- ilogit(sum(beta_hat * c(1, 68, 20))))
+```
+and
+```{r}
+(p2 <- ilogit(sum(beta_hat * c(1, 68, 0))))
+```
+Then the relative risk is
+```{r}
+p1 / p2
+```
+
+- When the probability of event is very small (rare disease assumption), i.e., $p_1, p_2 \approx 0$, then the odds ratio is approximately equal to the risk ratio
+$$
+\frac{o_1}{o_2} = \frac{p_1 / (1 - p_1)}{p_2 / (1 - p_2)} \approx \frac{p_1}{p_2}. 
+$$
+
+## Inference (analysis of deviance)
+
+- The **deviance** of a logistic regression fit is 
+\begin{eqnarray*}
+D &=& 2 \sum_i \left[ y_i \log y_i + (1 - y_i) \log (1 - y_i) \right] \\
+ && - 2 \sum_i \left[ y_i \log \widehat{p}_i + (1 - y_i) \log (1 - \widehat{p}_i) \right] \\
+&=& - 2 \sum_i \left[ y_i \log \widehat{p}_i + (1 - y_i) \log (1 - \widehat{p}_i) \right].
+\end{eqnarray*}
+It comes from the likelihood ratio test (LRT) statistic 
+$$
+2 \log \frac{L_{\Omega}}{L_{\omega}},
+$$
+where $\Omega$ is the full/saturated model (same number of parameters as observations) and $\omega$ is the smaller model. 
+
+- The usual goodness of fit test using $\chi_{n-q-1}^2$ asymptotic null distribution can **not** be applied here since we only have a single observation for each predictor pattern. This is different from the binomial model in next chapter. The Hosmer-Lemeshow test partitions the predicted probailities into $J$ bins and then carries out a Pearson $X^2$ type test to assess the goodness of fit (ELMR 2.6).
+
+- In the model output, the **residual deviance**, denoted $D_L$, is the devience of the current model and the _null deviance_, denoted $D_S$, is the deviance of the model with just an intercept term. Assuming the null model, the test statistic $D_S - D_L$ is asymptotically distributed $\chi_{\ell - s}^2$. In our case, the test statistic is
+```{r}
+lmod$null.deviance - lmod$deviance
+```
+giving p-value
+```{r}
+pchisq(lmod$null.deviance - lmod$deviance, 2, lower.tail = FALSE)
+```
+Therefore our model gives a significantly better fit than the null (intercept-only) model.
+
+- We can also test the significance of individual predictor using analysis of deviance (`anova` function). For example, is `height` necessary in the model?
+```{r}
+# fit a model without height
+lmodc <- glm(chd ~ cigs, family = binomial, wcgs)
+anova(lmodc, lmod, test = "Chi")
+```
+
+- Similar to linear regression, the convenience function `drop1` tests each individual predictor in one shot.
+```{r}
+drop1(lmod, test = "Chi")
+```
+
+- The coefficient test from summary is based on the z-value $\hat \beta_j / \text{se}(\hat{\beta}_j)$.
+```{r}
+lmod_sm$coefficients
+```
+In general, deviance-based test is preferred over the z-test.
+
+## Confidence intervals
+
+- Confidence interval can be constructed either from normal approximation
+$$
+\hat \beta_j \pm z^{\alpha / 2} \text{se}(\hat \beta_j)
+$$
+```{r}
+tibble(
+  `coef`  = beta_hat,
+  `2.5%`  = beta_hat - 1.96 * lmod_sm$coefficients[, 2],
+  `97.5%` = beta_hat + 1.96 * lmod_sm$coefficients[, 2])
+```
+or from profile-likelihood
+```{r}
+confint(lmod)
+```
+
+## Diagnostics
+
+- There are two kinds of fitted values (or predicted values). The first is on the scale of the linear predictor, $\eta$,
+```{r}
+linpred  <- predict(lmod)
+linpred %>% head(10)
+```
+The second on the scale of response, $p = \text{logit}^{-1}(\eta)$,
+```{r}
+predprob <- predict(lmod, type = "response")
+predprob %>% head(10)
+```
+
+- We compute the **raw residuals**
+$$
+y - \widehat{p}
+$$
+```{r}
+# same as residuals(lmod, type = "response")
+rawres <- lmod$y - predprob
+```
+The plot of raw residuals against the fitted values is not very informative.
+```{r}
+wcgs %>%
+  mutate(rawres = rawres, linpred = linpred) %>%
+  ggplot() +
+  geom_point(mapping = aes(x = linpred, y = rawres)) +
+  labs(x = "Linear predictor", y = "Raw residuals")
+```
+We do not expect the raw residuals to have equal variance because the binary variance is $p(1 - p)$.
+
+- The **deviance residuals** are standardized residuals defined by
+$$
+d_i = \text{sign}(y_i - \widehat{p}_i) \sqrt{-2 [y_i \log\widehat{p}_i + (1 - y_i) \log(1 - \widehat{p}_i)]}.
+$$
+Note 
+$$
+\sum_i d_i^2 = \text{deviance}
+$$
+in analogy to $\sum_i \widehat{\epsilon}_i^2 = \text{RSS}$ in linear regression. The term $\text{sign}(y_i - \widehat{p}_i)$ ensures that $d_i$ has the same sign as raw residual $y_i - \widehat{p}_i$.
+```{r}
+devres <- residuals(lmod)
+devres %>% head(10)
+```
+Sanity check:
+```{r}
+sqrt(-2 * (lmod$y * log(predprob) + (1 - lmod$y) * log(1 - predprob))) %>%
+  head(10)
+```
+The plot of deviance residuals against the fitted values.
+```{r}
+wcgs %>%
+  mutate(devres = devres, linpred = linpred) %>%
+  ggplot() +
+  geom_point(mapping = aes(x = linpred, y = devres)) +
+  labs(x = "Linear predictor", y = "Deviance residuals")
+```
+Again we see the residuals are clustered into two lines: the upper one corresponding to $y_i=1$ and the lower one to $y_i=0$. We can improve this plot by binning: divide the range of linear predictor into 100 bins of roughly equal points and plot average residual against average linear predictors per bin. 
+```{r}
+wcgs %>%
+  mutate(devres = devres, linpred = linpred) %>% 
+  group_by(cut(linpred, breaks = unique(quantile(linpred, (1:100)/101)))) %>%
+  summarize(devres = mean(devres), 
+            linpred = mean(linpred)) %>%
+  ggplot() +
+  geom_point(mapping = aes(x = linpred, y = devres)) + 
+  labs(x = "Linear predictor", y = "Binned deviance residual")
+```
+**Question**: is there a concern that the deviance residuals are not centered around 0? 
+
+- QQ plot is not helpful since there is no reason these deviance residuals are approximately standard normal.
+```{r}
+qqnorm(devres)
+```
+
+- Half-normal plot (hat values against half-normal quantiles) can help detect unusual cases in predictor space (high leverage cases). For logistic regression, we use the generalized hat matrix
+$$
+\mathbf{H} = \widehat{\mathbf{W}}^{1/2} \mathbf{X}^T (\mathbf{X}^T \widehat{\mathbf{W}} \mathbf{X})^{-1} \mathbf{X} \widehat{\mathbf{W}}^{1/2},
+$$
+where 
+$$
+\widehat{\mathbf{W}} = \begin{pmatrix} 
+\widehat{p}_1 (1 - \widehat{p}_1) & \\
+& \ddots & \\
+& & \widehat{p}_n (1 - \widehat{p}_n)
+\end{pmatrix}.
+$$
+```{r}
+halfnorm(hatvalues(lmod))
+```
+We see two high leverage cases, who smoke an unusual number of cigarettes per day!
+```{r}
+wcgs %>%
+  slice(c(2527, 2695)) %>%
+  print(width = Inf)
+```
+
+- Plot of Cook distance against half-normal quantiles may reveal high influential points (high residual combined with high leverage) cases.
+```{r}
+halfnorm(cooks.distance(lmod))
+```
+```{r}
+wcgs %>%
+  slice(c(953, 2082)) %>%
+  print(width = Inf)
+```
+
+## Goodness of fit
+
+### Hosmer-Lemeshow statistic
+
+- Intuitively if we divide observations into $J$ bins according to linear predictors $\eta$, then $y_j / n_j$ (observed proportion of "successes") for $j$-th bin should be close to the average predicted probabilities in that bin.
+```{r}
+wcgs_binned <- wcgs %>%
+  mutate(predprob = predict(lmod, type = "response"), 
+         linpred  = predict(lmod, type = "link"),
+         bin      = cut(linpred, breaks = unique(quantile(linpred, (1:100) / 101)))) %>%
+  group_by(bin) %>%
+  summarize(y       = sum(ifelse(chd == "yes", 1, 0)), 
+            avgpred = mean(predprob), 
+            count   = n()) %>%
+  mutate(se_fit = sqrt(avgpred * (1 - avgpred) / count))
+```
+```{r}
+wcgs_binned %>%
+  ggplot(mapping = aes(x = avgpred, y = y / count)) + 
+  geom_point() +
+  geom_linerange(mapping = aes(ymin = y / count - 2 * se_fit,
+                               ymax = y / count + 2 * se_fit), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1) +
+  labs(x = "Predicted probability", y = "Observed proportion")
+```
+
+- The Hosmer-Lemeshow test formalizes this idea by testing the statistic
+$$
+X_{\text{HL}}^2 = \sum_{j=1}^J \frac{(y_i - m_j \widehat{p}_j)^2}{m_j \widehat{p}_j (1 - \widehat{p}_j)}
+$$
+against the $\chi^2$ distribution with $J-1$ degrees of freedom.
+```{r}
+# Hosmer-Lemeshow test statistic
+(hlstat <- with(wcgs_binned, sum((y - count * avgpred)^2 / (count * avgpred * (1 - avgpred)))))
+# J
+nrow(wcgs_binned)
+# p-value
+pchisq(hlstat, nrow(wcgs_binned) - 1, lower.tail = FALSE)
+```
+We see a moderate p-value, which indicates no lack of fit.
+
+### ROC curve
+
+- Logistic regression is often used as a tool for **classification**. 
+
+- If we choose a threshold, say 0.2, then the predicted probabilities give a classification rule
+$$
+\text{case $i$ is a} \begin{cases}
+\text{"success"} & \text{if } \widehat{p}_i \ge 0.2 \\
+\text{"failure"} & \text{if } \widehat{p}_i < 0.2
+\end{cases}.
+$$
+```{r}
+wcgs %>% 
+  mutate(predprob = predict(lmod, type = "response")) %>% 
+  mutate(predout = ifelse(predprob >= 0.2, "yes", "no")) %>%
+  xtabs(~ chd + predout, data = .)
+```
+
+- With this classification rule, we see the error rate is about
+```{r}
+(11 + 254) / (2886 + 254 + 11 + 3)
+```
+![](https://upload.wikimedia.org/wikipedia/commons/e/e7/Sensitivity_and_specificity.svg)
+
+The **sensitivity** is
+$$
+\frac{\text{TP}}{\text{TP + FN}} = \frac{3}{257} = 1.17\%
+$$
+and the **specificity** is
+$$
+\frac{\text{TN}}{\text{FP + TN}} = \frac{2886}{11 + 2886} = 99.62\%
+$$
+
+- If we lower the threshold, then we increase the sensitivity but decrease the specificity. If we plot sensitivity against 1-specificity by varying the threshold, then we get the **receiver operating characteristic (ROC)** curve. 
+```{r}
+library(pROC)
+lmod_roc <- roc(chd ~ predprob, wcgs)
+ggroc(lmod_roc)
+```
+The area under the curve (AUC) is a measure of the overal classification of the classifier. Larger AUC means better classification performance. 
+```{r}
+auc(lmod_roc)
+```
+
+## Model selection by AIC
+
+- We can perform sequential search using the Akaike information criterion (AIC)
+$$
+\text{AIC} = \text{deviance} + 2q.
+$$
+We start from a rich enough model
+```{r}
+wcgs <- wcgs %>%
+  # 1 in = 0.0254 m, 1 lb = 0.4536 kg
+  mutate(bmi = 703 * weight / height)
+biglm <- glm(chd ~ age + height + weight + bmi + sdp + dbp + chol + dibep + cigs + arcus,
+             family = binomial, data = wcgs)
+```
+and then do sequential backward search using the `step` function
+```{r}
+step(biglm, trace = TRUE, direction = "both") %>%
+  tbl_regression() %>%
+  bold_labels()
+```
+
+## Model selection by lasso
+
+- A modern approach for model selection is the **lasso**, which minimizes the function   
+$$
+  - n^{-1} \ell(\boldsymbol{\beta}) + \lambda \sum_{j=1}^q |\beta_j|,  
+$$   
+where $\ell(\boldsymbol{\beta})$ is the log-likelihood of logistic regression and $\lambda>0$ is a tuning parameter. We notice that   
+    - when $\lambda = \infty$, all non-intercept regression coefficients will be pushed to 0, and   
+    - when $\lambda = 0$, the regression coefficients are same as those from regular logistic regression.  
+If we vary $\lambda$ from 0 to larger values, we will obtain intermediate models with lesser and lesser preditors. This way we are achieving continuous model selection.
+
+- For details of `glmnet` package, see the vignette at <https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html>
+
+- How do we choose $\lambda$, which determines the model size? One natural idea is to split the data into a training set and a validation set. The **training set** is used to fit the logistic regression at different $\lambda$ values. Then the **validation set** is used to evaluate and compare the performance of different models. We will choose the model that gives the best performance on the validation set.
+
+- First let's remove cases with missing values
+```{r}
+(wcgs <- wcgs %>% 
+  select(-c(behave, typechd, timechd)) %>%
+  drop_na())
+```
+split data into 80% training cases and 20% validation cases.
+```{r}
+library(glmnet)
+library(caret)
+
+# set seed for reproducibility
+set.seed(200)
+
+# list = FALSE, request result to be in a matrix (of row position) not a list
+training_samples <- wcgs$chd %>%
+  createDataPartition(p = 0.8, list = FALSE)
+# (train_data <- wcgs %>%
+#   slice(training_samples[, 1]))
+# (val_data   <- wcgs %>%
+#   slice(-training_samples[, 1]))
+```
+The `glmnet` package takes a matrix (of predictors) and a vector (of responses) as input. We use `model.matrix` function to create them. `glmnet` will add intercept by default, so we drop intercept term when forming `x` matrix.
+```{r}
+# X and y from original data
+x_all <- model.matrix(
+  chd ~ - 1 + age + height + weight + bmi + sdp + dbp + chol + dibep + cigs + arcus, 
+  data = wcgs)
+y_all <- ifelse(wcgs$chd == "yes", 1, 0)
+# training X and y
+x_train <- x_all[training_samples[, 1], ]
+y_train <- y_all[training_samples[, 1]]
+# validation X and y
+x_val <- x_all[-training_samples[, 1], ]
+y_val <- y_all[-training_samples[, 1]]
+```
+Fit lasso regression and plot solution path:
+```{r}
+lasso_fit <- glmnet(x_train, y_train, family = "binomial", alpha = 1)
+summary(lasso_fit)
+plot(lasso_fit, xvar = "lambda", label = TRUE)
+```
+
+- Here   
+    - $\alpha = 1$ corresponds to the lasso regression, in the family of **elastic net penalties**
+$$
+(1 - \alpha) \|\boldsymbol{\beta}\|_2^2 / 2 + \alpha \|\boldsymbol{\beta}\|_1.
+$$   
+    - Other choises for `xvar` are `"lambda"` for log lambda value, `"norm"` for the $\ell_1$-norm of the coefficients (default), and `"dev"` for the percentage of deviance explained.  
+
+- Now we can evaluate the performance of the models (corresponding to different $\lambda$ values) on the validation set.
+```{r}
+# predict validation case probabilities at different \lambda values and calculate test deviance
+pred_val <- predict(lasso_fit, newx = x_val, type = "response", s = lasso_fit$lambda)
+dev_val <- -2 * colSums(y_val * log(pred_val) + (1 - y_val) * log(1 - pred_val))
+tibble(lambda = lasso_fit$lambda, dev_val = dev_val) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = lambda, y = dev_val)) + 
+  scale_x_log10() +
+  labs(y = "Binomial deviance on validation set", x = "Lambda")
+```
+From the graph, it seems that $\lambda = 0.005$ yields a model that performs best on the validation set.  
+
+- Now the question is whether we should make decision on this single training-validation split? A common strategy is to use **cross validation**. 
+```{r}
+set.seed(200)
+cv_lasso <- cv.glmnet(x_all, y_all, alpha = 1, family = "binomial", 
+                      type.measure = "auc")
+plot(cv_lasso)
+```
+The plot displays the cross-validation error (devience by default, we chose AUC here) according to the log of lambda. The left dashed vertical line indicates that the log of the optimal value of log lambda is approximately -5.2, which is the one that minimizes the average AUC. This lambda value will give the most accurate model. The exact value of lambda and corresponding model can be viewed as follow:
+```{r}
+cv_lasso$lambda.min
+coef(cv_lasso, cv_lasso$lambda.min)
+```
+We see that this model differs from the best model chosen by AIC by replacing the predictor `bmi` by `weight`.
