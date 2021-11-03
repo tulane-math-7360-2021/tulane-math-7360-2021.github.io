@@ -376,6 +376,7 @@ p-values are not reported because inference for robust model is much harder than
     ```
 
     `termplot` graphically summarizes the effect of each predictor. `terms` argument of `termplot` function specifies which term to plot. Pratial residuals are predictor values plus residual values.
+    - For more information about partial-residuals, refer to page 71 (and around pages) of linear models [lecture note](https://tulane-math-7260-2021.github.io/schedule/schedule.html).
     
     ```{r}
     termplot(plmodi, partial.resid = TRUE, terms = 2)
