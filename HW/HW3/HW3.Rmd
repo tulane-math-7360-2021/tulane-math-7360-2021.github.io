@@ -1,0 +1,251 @@
+---
+title: "HW3  Due: Dec 10, 2021"
+author: "Dr. Xiang Ji @ Tulane"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+```
+
+## Acknowledgement
+
+Dr. Hua Zhou's [HW assignment](https://ucla-biostat-200c-2020spring.github.io/hw/hw1/hw1.html#q2.-cfr-of-covid-19)
+
+## CFR of COVID-19
+
+Of primary interest to public is the risk of dying from COVID-19. A commonly used measure is case fatality rate/ratio/risk (CFR), which is defined as
+$$
+\frac{\text{number of deaths from disease}}{\text{number of diagnosed cases of disease}}.
+$$
+Apparently CFR is not a fixed constant; it changes with time, location, and other factors. Also CFR is different from the infection fatality rate (IFR), the probability that someone infected with COVID-19 dies from it. 
+
+In this exercise, we use logistic regression to study how US county-level CFR changes according to demographic information and some health-, education-, and economy-indicators.
+
+### Data sources
+
+- `11-02-2021.csv`: The data on COVID-19 confirmed cases and deaths on 2021-11-02 is retrieved from the [Johns Hopkins COVID-19 data repository](https://github.com/CSSEGISandData/COVID-19). It was downloaded from this [link](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports) (commit a94c128).
+
+- `us-county-health-rankings-2020.csv.zip`: The 2020 County Health Ranking Data was released by [County Health Rankings](https://www.countyhealthrankings.org). The data was downloaded from the [Kaggle Uncover COVID-19 Challenge](https://www.kaggle.com/roche-data-science-coalition/uncover) (version 1).
+
+### Sample code for data preparation
+
+Load the `tidyverse` package for data manipulation and visualization.
+```{r}
+# tidyverse of data manipulation and visualization
+library(tidyverse)
+```
+Read in the data of COVID-19 cases reported on 2021-11-02.
+```{r}
+county_count <- read_csv("./11-02-2021.csv") %>%
+  # cast fips into dbl for use as a key for joining tables
+  mutate(FIPS = as.numeric(FIPS)) %>%
+  filter(Country_Region == "US") %>%
+  print(width = Inf)
+```
+Standardize the variable names by changing them to lower case.
+```{r}
+names(county_count) <- str_to_lower(names(county_count))
+```
+Sanity check by displaying the unique US states and territories:
+```{r}
+county_count %>%
+  select(province_state) %>%
+  distinct() %>%
+  arrange(province_state) %>%
+  print(n = Inf)
+```
+We want to exclude entries from `American Samoa`, `Diamond Princess`, `Grand Princess`, `Guam`, `Northern Mariana Islands`, `Puerto Rico`, `Recovered`, and `Virgin Islands`, and only consider counties from 50 states and DC.
+```{r}
+county_count <- county_count %>%
+  filter(!(province_state %in% c("American Samoa", "Diamond Princess", "Grand Princess", 
+                                 "Recovered", "Guam", "Northern Mariana Islands", 
+                                 "Puerto Rico", "Virgin Islands"))) %>%
+  print(width = Inf)
+```
+Graphical summarize the COVID-19 confirmed cases and deaths on 2021-11-02 by state.
+```{r}
+county_count %>%
+  # turn into long format for easy plotting
+  pivot_longer(confirmed:recovered, 
+               names_to = "case", 
+               values_to = "count") %>%
+  group_by(province_state) %>%
+  ggplot() + 
+  geom_col(mapping = aes(x = province_state, y = `count`, fill = `case`)) + 
+  # scale_y_log10() + 
+  labs(title = "US COVID-19 Situation on 2021-11-02", x = "State") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Read in the 2020 county-level health ranking data.
+```{r}
+county_info <- read_csv("./us-county-health-rankings-2020.csv") %>%
+  filter(!is.na(county)) %>%
+  # cast fips into dbl for use as a key for joining tables
+  mutate(fips = as.numeric(fips)) %>%
+  select(fips, 
+         state,
+         county,
+         percent_fair_or_poor_health, 
+         percent_smokers, 
+         percent_adults_with_obesity, 
+         # food_environment_index,
+         percent_with_access_to_exercise_opportunities, 
+         percent_excessive_drinking,
+         # teen_birth_rate, 
+         percent_uninsured,
+         # primary_care_physicians_rate,
+         # preventable_hospitalization_rate,
+         # high_school_graduation_rate,
+         percent_some_college,
+         percent_unemployed,
+         percent_children_in_poverty,
+         # `80th_percentile_income`,
+         # `20th_percentile_income`,
+         percent_single_parent_households,
+         # violent_crime_rate,
+         percent_severe_housing_problems,
+         overcrowding,
+         # life_expectancy,
+         # age_adjusted_death_rate,
+         percent_adults_with_diabetes,
+         # hiv_prevalence_rate,
+         percent_food_insecure,
+         # percent_limited_access_to_healthy_foods,
+         percent_insufficient_sleep,
+         percent_uninsured_2,
+         median_household_income,
+         average_traffic_volume_per_meter_of_major_roadways,
+         percent_homeowners,
+         # percent_severe_housing_cost_burden,
+         population_2,
+         percent_less_than_18_years_of_age,
+         percent_65_and_over,
+         percent_black,
+         percent_asian,
+         percent_hispanic,
+         percent_female,
+         percent_rural) %>%
+  print(width = Inf)
+```
+
+For stability in estimating CFR, we restrict to counties with $\ge 5$ confirmed cases.
+```{r}
+county_count <- county_count %>%
+  filter(confirmed >= 5)
+```
+We join the COVID-19 count data and county-level information using FIPS (Federal Information Processing System) as key. 
+```{r}
+county_data <- county_count %>%
+  left_join(county_info, by = "fips") %>%
+  print(width = Inf)
+```
+Numerical summaries of each variable:
+```{r}
+summary(county_data)
+```
+List rows in `county_data` that don't have a match in `county_count`:
+```{r}
+county_data %>%
+  filter(is.na(state) & is.na(county)) %>%
+  print(n = Inf)
+```
+We found there are some rows that miss `fips`. 
+```{r}
+county_count %>%
+  filter(is.na(fips)) %>%
+  select(fips, admin2, province_state) %>%
+  print(n = Inf)
+```
+We need to (1) manually set the `fips` for some counties, (2) discard those `Unassigned`, `unassigned` or `Out of`, and (3) try to join with `county_info` again.
+```{r}
+county_data <- county_count %>%
+  # manually set FIPS for some counties
+  mutate(fips = ifelse(admin2 == "Dukes and Nantucket" & province_state == "Massachusetts", 25019, fips)) %>% 
+  mutate(fips = ifelse(admin2 == "Weber-Morgan" & province_state == "Utah", 49057, fips)) %>%
+  # remove variable `recovered` and `active` because they are just columns of NAs
+  mutate(recovered = NULL, active = NULL) %>%
+  filter(!(is.na(fips) | str_detect(admin2, "Out of") | str_detect(admin2, "Unassigned"))) %>%
+  left_join(county_info, by = "fips") %>%
+  drop_na() %>%
+  print(width = Inf)
+```
+Summarize again
+```{r}
+summary(county_data)
+```
+If there are variables with missing value for many counties, we go back and remove those variables from consideration.
+
+Let's create a final data frame for analysis.
+```{r}
+county_data <- county_data %>%
+  mutate(state = as.factor(state)) %>%
+  select(county, confirmed, deaths, state, percent_fair_or_poor_health:percent_rural)
+summary(county_data)
+```
+Display the 10 counties with highest CFR.
+```{r}
+county_data %>%
+  mutate(cfr = deaths / confirmed) %>%
+  select(county, state, confirmed, deaths, cfr) %>%
+  arrange(desc(cfr)) %>%
+  top_n(10)
+```
+Write final data into a csv file for future use.
+```{r}
+write_csv(county_data, "covid19-county-data-20211102.csv.gz")
+```
+
+### 1 
+
+Read and run above code to generate a data frame `county_data` that includes county-level COVID-19 confirmed cases and deaths, demographic, and health related information. 
+
+### 2
+
+What assumptions of CFR might be violated by defining CFR as `deaths/confirmed` from this data set? With acknowledgement of these severe limitations, we continue to use `deaths/confirmed` as a very rough proxy of CFR.
+
+### 3 
+
+What assumptions of logistic regression may be violated by this data set?
+
+### 4 
+
+Run a binomial regression, using variables `state`, ..., `percent_rural` as predictors. 
+
+### 5 
+
+Interpret the regression coefficients of 3 significant predictors with p-value <0.01.
+
+### 6 
+
+Apply analysis of deviance to (1) evaluate the goodness of fit of the model and (2) compare the model to the intercept-only model. 
+
+### 7
+
+Perform analysis of deviance to evaluate the significance of each predictor. Display the 10 most significant predictors.
+
+### 8
+
+Construct confidence intervals of regression coefficients.
+
+### 9 
+
+Plot the deviance residuals against the fitted values. Are there potential outliers?
+
+### 10
+
+Plot the half-normal plot. Are there potential outliers in predictor space?
+
+### 11
+
+Find the best sub-model using the AIC criterion.
+
+### 12
+
+Find the best sub-model using the lasso with cross validation.
