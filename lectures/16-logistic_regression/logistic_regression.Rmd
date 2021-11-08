@@ -1,7 +1,7 @@
 ---
 title: "Logistic Regression"
 author: "Dr. Xiang Ji @ Tulane University"
-date: "Nov 3, 2021"
+date: "Nov 8, 2021"
 output:
   html_document:
     toc: true
@@ -48,9 +48,11 @@ print(students)
 
   - all on zoom to save transition time
 
-- I see nobody graduating this semester, confirm (?).
+- Please send me an email if I didn't notice you are graduating this semester.
 
-  - Final report due 01/03/2022
+  - Final report due for graduating students 12/22/2021 (grades due 12/23/2021)
+
+  - Final report due 01/03/2022 (grades due 01/05/2022)
 
 
 ## Acknowledgement
