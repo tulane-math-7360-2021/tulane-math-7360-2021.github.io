@@ -54,6 +54,7 @@ print(students)
 
   - Final report due 01/03/2022 (grades due 01/05/2022)
 
+- HW2 solutions posted
 
 ## Acknowledgement
 
