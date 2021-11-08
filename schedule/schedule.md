@@ -20,7 +20,7 @@ Topics:
 - Generalized linear models
 - Neural network
 - Classification
-- Advanced R programming (if time permits)
+- Advanced R programming
 
 
 | Monday | Wednesday | Friday | HW |
