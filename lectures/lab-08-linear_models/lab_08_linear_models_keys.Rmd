@@ -1,0 +1,147 @@
+---
+title: "Lab 08 linear models"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Nov 05, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+
+## Formulas in R
+
+reference [R4DS](https://r4ds.had.co.nz/model-basics.html#formulas-and-model-families)
+
+R uses formulas for most modelling functions.
+
+A simple example: `y ~ x` translates to: $y = \beta_0 + x\beta_1$.
+
+Below is a summary for some popular uses
+
+| Use | Example | Translation |
+| --- | ------- | ----------- |
+| Simple example | `y ~ x` |  $y = \beta_0 + x\beta_1$ |
+| Exclude intercept | `y ~ x - 1` or `y ~ x + 0` | $y = x\beta$ |
+| Add a continuous variable | `y ~ x1 + x2` | $y = \beta_0 + x_1 \beta_1 + x_2 \beta_2$ |
+| Add a categorical variable | `y ~ x1 + sex` | $y = \beta_0 + x_1 \beta_1 + \mbox{sex_male} \beta_2$ |
+| Interactions (continuous and categorical)| `y ~ x1 * sex` | $y = \beta_0 + x_1 \beta1 + \mbox{sex_male} \beta_2 + x_1 \mbox{sex_male} \beta_{12}$|
+| Interactions (continuous and continuous)| `y ~ x1 * x_2` | $y = \beta_0 + x_1 \beta1 + x_2 \beta_2 + x_1 x_2 \beta_{12}$|
+
+You can specify transformations inside the model formula too (besides creating new transformed variables in your data frame).
+
+For example, `log(y) ~ sqrt(x1) + x2` is transformed to $\log(y) = \beta_0 + \sqrt{x_1} \beta_1 + x_2 \beta_2$.
+
+One thing to note is that if your transformation involves `+`, `*`, `^` or `-`, you will need to wrap it in `I()` so R doesn't treat it like part of the model specification.
+
+For example, `y ~ x + I(x ^ 2)` is translated to $y = \beta_0 + x \beta_1 + x^2 \beta_2$.
+
+And remember, R automatically drops redundant variables so `x + x` become `x`.
+
+### Q1 write out the translated formula below:
+
+- `y ~ x ^ 2 + x`
+
+$y = \beta_0 + x\beta_1$
+
+- `y ~ x + x ^ 2 + x ^ 3`
+
+$y = \beta_0 + x\beta_1$
+
+- `y ~ poly(x, 3)`
+
+$y = \beta_0 + x\beta_1 + x^2\beta_2 + x^3\beta_3$
+
+- `y ~ (x1 + x2 + x3) ^2 + (x2 + x3) * (x4 + x5)`
+
+$$
+y = \beta_0 + x_1\beta_1 + x_2 \beta_2 + x_3 \beta_3 + x_4 \beta_4 + x_4\beta_5 +
+x_1 x_2 \beta_{12} + x_1 x_3 \beta_{13} + x_2 x_3 \beta_{23} + x_2 x_4 \beta_{24} + x_2 x_5 \beta_{25} 
++ x_3 x_4 \beta_{34} + x_3 x_5 \beta_{35}
+$$
+
+## Model selection
+
+In the class, we used stepwise regression.  Now we visit the other two sequential methods:
+
+1. Forward selection:
+
+    1. Determine a shreshold significance level for entering predictors into the model
+    
+    2. Begin with a model without any predictors, i.e., $y = \beta_0 + \epsilon$
+    
+    3. For each predictor not in the model, fit a model that adds that predictor to the working model.  Record the t-statistic and p-value for the added predictor.
+    
+    4. Do any of the predictors considered in step 3 have a p-value less than the shreshold specified in step 1?
+    
+        - Yes: Add the predictor with the smallest p-value to the working model and return to step 3
+        
+        - No: Stop.  The working model is the final model.
+        
+
+2. Backwards elimination
+
+    1. Determine a threshold significance level for removing predictors from the model.
+    
+    2. Begin with a model that includes all predictors.
+    
+    3. Examine the t-statistic and p-value of the partial regression coefficients associated with each predictor.
+    
+    4. Do any of the predictors have a p-value **greater** than the threshold specified in step 1?
+    
+        - Yes: Remove the predictor with the largest p-value from the working model and return to step 3.
+        
+        - No: Stop.  The working model is the final model.
+        
+3. Stepwise selection
+
+    Combines forward selection and backwards elimination steps.
+  
+Now perform Model selection on the cheddar dataset from the faraway package.
+
+Use `taste` as the response variable.
+
+### Q2a. perform forward model selection from the model `taste ~ 1`
+
+```{r}
+library(faraway)
+(small.lm <- lm(taste ~ 1, data = cheddar))
+(biglm <- lm(taste ~ (Acetic + H2S + Lactic) ^ 2, data = cheddar))
+(small.final.lm <- step(small.lm, trace = TRUE, direction = "forward", scope = formula(biglm)))
+```
+
+### Q2b perform backward selection
+
+finish the code below
+```{r}
+# start from the large model that include all
+biglm <- lm(taste ~ (Acetic + H2S + Lactic) ^ 2, data = cheddar)
+(smallm <- step(biglm, trace = TRUE, direction = "backward"))
+(smallm <- step(biglm, trace = TRUE))
+```
+
+
+### What is your final model?
+
+$$
+taste = \beta_0 + H2S \beta_1 + Lactic \beta_2
+$$
+
+### What is the predicted taste value for `Acetic = 4.5`, `H2S = 3.8` and `Lactic = 1.00`?
+What is the prediction confidence interval?  What causes the difference between them?
+
+```{r}
+library(tidyverse)
+pdf <- tibble(Acetic = 4.5,
+              H2S = 3.8,
+              Lactic = 1.00)
+# prediction interval gives uncertainty around a single value.
+(predict(smallm, new = pdf, interval = "prediction"))
+
+# confidence interval reflects the uncertainty around the mean predictions.
+(predict(smallm, new = pdf, interval = "confidence"))
+
+# For prediction interval, we not only consider the variation of the mean value of the response, but also the error term for the single point such that the prediction interval is always larger than the confidence interval.
+```
