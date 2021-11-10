@@ -1,0 +1,343 @@
+---
+title: "Binomial Regression"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Nov 10, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+
+```{r setup, include=FALSE}
+rm(list = ls()) # clean-up workspace
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+```
+
+## Announcement
+
+- HW2 graded
+
+- HW3 posted
+
+## Acknowledgement
+
+Dr. Hua Zhou's [slides](https://ucla-biostat-200c-2020spring.github.io/slides/03-binary/binary.html)
+
+## O-ring example
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Space_Shuttle_Challenger_%2804-04-1983%29.JPEG/300px-Space_Shuttle_Challenger_%2804-04-1983%29.JPEG)
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Challenger_explosion.jpg/296px-Challenger_explosion.jpg)
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Challenger_flight_51-l_crew.jpg/300px-Challenger_flight_51-l_crew.jpg)
+
+![](https://qph.fs.quoracdn.net/main-qimg-68daeded849b4a3a049eeb78822a68bb)
+
+- In January 1986, the space shuttle Challenger exploded 73 seconds after launch.  
+
+- The culprit is the O-ring seals in the rocket boosters. At lower temperatures, rubber becomes more brittle and is a less effective sealant. At the time of the launch, the temperature was 31°F.  
+
+-  Could the failure of the O-rings have been predicted?  
+
+- Data: 23 previous shuttle missions. Each shuttle had 2 boosters, each with 3 O-rings. We know the number of O-rings out of 6 showing some damage and the launch temperature.  
+
+```{r}
+orings <- orings %>%
+  as_tibble(rownames = "mission") %>%
+  print(n = Inf)
+```
+
+## Descriptive statistics
+
+There seems a pattern: lower temperature, more damages. 
+```{r}
+oring_plot <- orings %>%
+  mutate(failrate = damage / 6) %>%
+  ggplot(mapping = aes(x = temp, y = failrate)) + 
+  geom_point() + 
+  labs(x = "Temperature (F)", y = "Proportion of damages", title = "O-ring damage data")
+plot(oring_plot)
+```
+
+## Binomial model
+
+- We model $Y_i$ as a Binomial random variable with batch size $m_i$ and "success" probability $p_i$
+$$
+\mathbb{P}(Y_i = y_i) = \binom{m_i}{y_i} p_i^{y_i} (1 - p_i)^{m_i - y_i}.
+$$
+
+- The parameter $p_i$ is linked to the predictors $X_1, \ldots, X_{q}$ via an **inverse link function**
+$$
+p_i = \frac{e^{\eta_i}}{1 + e^{\eta_i}},
+$$
+where $\eta_i$ is the **linear predictor** or **systematic component**
+$$
+\eta_i = \beta_0 + \beta_1 x_{i1} + \cdots + \beta_{q} x_{iq} = \mathbf{x}_i^T \boldsymbol{\beta}
+$$
+
+- The log-likelihood is
+\begin{eqnarray*}
+\ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \left[ y_i \log p_i + (m_i - y_i) \log (1 - p_i) + \log \binom{m_i}{y_i} \right] \\
+&=& \sum_{i=1}^n \left[ y_i \eta_i - m_i \log ( 1 + e^{\eta_i}) + \log \binom{m_i}{y_i} \right] \\
+&=& \sum_{i=1}^n \left[ y_i \cdot \mathbf{x}_i^T \boldsymbol{\beta} - m_i \log ( 1 + e^{\mathbf{x}_i^T \boldsymbol{\beta}}) + \log \binom{m_i}{y_i} \right].
+\end{eqnarray*}
+
+- The Bernoulli model in ELMR 2 is a special case with all batch sizes $m_i = 1$. 
+
+- Conversely, the Binomial model is equivalent to a Bernoulli model with $\sum_i m_i$ observations, or a Bernoulli model with observation weights $(y_i, m_i - y_i)$. 
+
+## Logistic regression
+
+For Binomial model, we input $(\text{successes}_i, \text{failures}_i)$ as responses.
+```{r}
+library(gtsummary)
+lmod <- glm(cbind(damage, 6 - damage) ~ temp, family = binomial, data = orings)
+lmod %>%
+  tbl_regression(intercept = TRUE)
+```
+
+Let's fit an equivalent (weighted) Bernoulli model. Not surprisingly, we get identical estimate.
+```{r}
+obs_wt = c(rbind(orings$damage, 6 - orings$damage))
+orings %>%
+  slice(rep(1:n(), each = 2)) %>% # replicate each row twice
+  mutate(damage = rep(c(1, 0), 23)) %>%
+  mutate(obs_wt = obs_wt) %>%
+  glm(damage ~ temp, weights = obs_wt, family = binomial, data = .) %>%
+  tbl_regression(intercept = TRUE)
+```
+
+## Prediction
+
+Now we can predict the failure probability. The failure probability at 31F is nearly 1.
+```{r}
+tibble(temp     = seq(25, 85, 0.1), 
+       predprob = predict(lmod, newdata = tibble(temp = temp), type = "response")) %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = temp, y = predprob)) + 
+  geom_vline(xintercept = 31) +
+  labs(x = "Temperature (F)", y = "Predicted failure probability")
+```
+
+## Goodness of fit
+
+- To evaluate the goodness of fit of model, we compare it to the full model with number of parameters equal to the number of observations. That is the full/saturated model estimates $p_i$ by $y_i/m_i$. Therefore the deviance is
+\begin{eqnarray*}
+  D &=& 2 \sum_i y_i \log(y_i/m_i) + (m_i - y_i) \log(1 - y_i / m_i) \\
+  & & - 2 \sum_i y_i \log(\widehat{p}_i) + (m_i - y_i) \log(1 - \widehat{p}_i) \\
+  &=& 2 \sum_i y_i \log(y_i / \widehat{y}_i) + (m_i - y_i) \log(m_i - y_i)/(m_i - \widehat{y}_i),
+\end{eqnarray*}
+where $\widehat{y}_i$ are the fitted values from the model. 
+
+- When $Y$ is truely binomial and $m_i$ are relatively large, the deviance $D$ is approximately $\chi_{n-q-1}^2$ if the model is correct. A rule of thumb to use this asymptotic approximation is $m_i \ge 5$. The large p-value indicates that the model has an adequate fit.
+```{r}
+pchisq(lmod$deviance, lmod$df.residual, lower = FALSE)
+```
+
+- Significance of the predictor `temp` can be evaluated using a similar analysis of deviance test.
+```{r}
+drop1(lmod, test = "Chi")
+```
+
+## Pearson $X^2$
+
+- The **Pearson $X^2$ statistic** takes the form
+$$
+X^2 = \sum_i \frac{(O_i - E_i)^2}{E_i}.
+$$
+In the case of binomial model, we get
+\begin{eqnarray*}
+X^2 &=& \sum_i \frac{(y_i - n_i \widehat{p}_i)^2}{n_i \widehat{p}_i} + \frac{[(n_i - y_i) - n_i (1 - \widehat{p}_i)]^2}{n_i (1 - \widehat{p}_i)}  \\
+&=& \sum_i \frac{(y_i - n_i \widehat{p}_i)^2}{n_i \widehat{p}_i (1 - \widehat{p}_i)}.
+\end{eqnarray*}
+Comparing Pearson $X^2$ statistic to the asymptotic null distribution $\chi_{n - q - 1}^2$ gives a goodness of fit test.
+```{r}
+predprob <- predict(lmod, type = "response")
+# Pearson X2 statistic
+(px2 <- sum((orings$damage - 6 * predprob)^2 / (6 * predprob * (1 - predprob))))
+pchisq(px2, lmod$df.residual, lower.tail = FALSE)
+```
+This large p-value indicates that this model fits data well.
+
+- We can define the **Perason residuals** as
+$$
+r_i^{\text{P}} = \frac{y_i - n_i \widehat{p}_i}{\sqrt{\operatorname{Var} \widehat{y}_i}}.
+$$
+Then
+$$
+X^2 = \sum_i \left(r_i^{\text{P}} \right)^2
+$$
+in analogy to $\text{RSS} = \sum_i r_i^2$ in linear regression.
+```{r}
+(presid <- residuals(lmod, type = "pearson"))
+```
+
+## Diagnostics
+
+- Plot deviance residuals against linear predictors to identify potential high residual observations.
+```{r}
+orings %>%
+  mutate(devres  = residuals(lmod, type = "deviance"),
+         linpred = predict(lmod, type = "link")) %>%
+  ggplot + 
+  geom_point(mapping = aes(x = linpred, y = devres)) +
+  labs(x = "Linear predictor", y = "Deviance residual")
+```
+
+- Plot sorted hat values against half-normal quantiles to identify potential high leverage observations.
+```{r}
+halfnorm(hatvalues(lmod))
+orings %>%
+  slice(c(1, 2))
+```
+
+
+- Plot sorted Cook distances against the half-normal quantiles to identify potential high influential observations.
+```{r}
+halfnorm(cooks.distance(lmod))
+orings %>%
+  slice(c(1, 18))
+```
+
+## Overdispersion
+
+- If we detect a lack of fit (unusual large deviance or Pearson $X^2$), we consider following causes.
+
+    1. Wrong systematic component. Most common explanation is we have the wrong structural form for the model. We have not included the right predictors or we have not transformed or combined them in the correct way.
+
+    2. Outliers. A few outliers with large deviance. If there are many, then we may have assumed the wrong error distribution for $Y$.
+
+    3. Sparse data. If binomial batch sizes are all small, then the $\chi^2$ approximation is bad. Rule of thumb for using the $\chi^2$ approximation is $m_i \ge 5$ for all batches.
+
+    4. Overdisperson or underdisperson. 
+
+- Binomial distribution arises when we assume that the trials in a batch are independent and share the same "success" probability.   
+
+    - Are the failures of those 6 O-rings in a space shuttle really independent of each other?  
+    
+    - Are the failure probability of those 6 O-rings in a space shuttle same?  
+    
+- Violation of the iid (identically and independently distributed) assumption of Bernoulli trials can lead to inflation of variance. 
+
+- We can relax the assumption of binomial distribution by allowing an **overdispersion parameter**
+$$
+\operatorname{Var} Y = \sigma^2 m p (1 - p).
+$$
+The dispersion parameter $\sigma^2$ can be estimated by
+$$
+\widehat{\sigma}^2 = \frac{X^2}{n - q - 1},
+$$
+where $q$ is the number of parameters consumed by the logistic regression. Estimation of $\boldsymbol{\beta}$ is unchanged but the inference is changed
+$$
+\operatorname{Var} \widehat{\boldsymbol{\beta}} = \widehat{\sigma}^2 (\mathbf{X}^T \widehat{\mathbf{W}} \mathbf{X})^{-1}.
+$$
+- Analysis of deviance by differences in deviances cannot be used because now the test statistic is distributed as $\sigma^2 \chi^2$. Since $\sigma^2$ is estimated, we can use $F$ test by comparing
+$$
+F = \frac{(D_{\text{small}} - D_{\text{large}})/ (\text{df}_{\text{small}} - \text{df}_{\text{large}})}{\widehat{\sigma}^2}
+$$
+to the (asymptotic) F distribution with degrees of freedom $\text{df}_{\text{small}} - \text{df}_{\text{large}}$ and $n-p$.
+
+- The `troutegg` data set records the number of surviving trout eggs at 5 stream locations and retrieved at 4 different times.
+```{r}
+troutegg
+```
+We fit a binomial model for the two main effects.
+```{r}
+library(gtsummary)
+bmod <- glm(cbind(survive, total - survive) ~ location + period,
+            family = "binomial", data = troutegg)
+#bmod %>%
+#  tbl_regression(exponentiate = TRUE) %>%
+#  bold_labels()
+summary(bmod)
+```
+
+Analysis of deviance for the significance of two factors
+```{r}
+drop1(bmod, test = "Chisq")
+```
+
+- A deviance value of `r deviance(bmod)` on `r df.residual(bmod)` degrees of freedom suggests a lack of fit. Diagnostics (not done here) does not reveal outliers. We estimate the dispersion parameter as
+```{r}
+(sigma2 <- sum(residuals(bmod, type = "pearson")^2) / 12)
+```
+which is substantially larger than 1. We can now see the scaled up standard errors
+```{r}
+summary(bmod, dispersion = sigma2)
+```
+and make F tests on predictors
+```{r}
+drop1(bmod, scale = sigma2, test = "F")
+```
+
+## Quasi-binomial
+
+- Another way to deal with overdispersion or underdispsersion is **quasi-binomial** model.
+
+- Assume
+\begin{eqnarray*}
+\mathbb{E} (Y_i) = \mu_i, \quad \operatorname{Var}(Y_i) = \phi V(\mu_i).
+\end{eqnarray*}
+Define a score
+$$
+U_i = \frac{Y_i - \mu_i}{\phi V(\mu_i)},
+$$
+with
+\begin{eqnarray*}
+\mathbb{E}(U_i) &=& 0, \quad
+\operatorname{Var}(U_i) = \frac{1}{\phi V(\mu_i)} \\ - \mathbb{E} \frac{\partial U_i}{\partial \mu_i} &=& - \mathbb{E} \frac{- \phi V(\mu_i) - (Y_i - \mu_i) \phi V'(\mu_i)}{[\phi V(\mu_i)]^2} = \frac{1}{\phi V(\mu_i)}.
+\end{eqnarray*}
+
+- $U_i$ acts like the derivative of a log-likelihood (score function). Thus we define
+$$
+Q_i = \int_{y_i}^{\mu_i} \frac{y_i - t}{\phi V(t)} \, dt
+$$
+and treat
+$$
+Q = \sum_{i=1}^n Q_i
+$$
+as a log **quasi-likelihood**.
+
+- $\widehat{\beta}$ is obtained by maximizing $Q$ and
+$$
+\widehat{\phi} = \frac{X^2}{n - p}.
+$$
+
+- Let's revisit the `troutegg` example.
+```{r}
+modl <- glm(survive / total ~ location + period, 
+            family = "quasibinomial", data = troutegg)
+summary(modl)
+```
+Individual predictor significance is
+```{r}
+drop1(modl, test = "F")
+```
+We see similar p-values as the overdispersion model. 
+
+## Beta regression
+
+- We may also directly model the proportions as a beta distribution $\text{Beta}(\alpha, \beta)$ with density
+$$
+f(y \mid \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1}(1 - y)^{\beta - 1}.
+$$
+If $Y \sim \text{Beta}(\alpha, \beta)$, then
+$$
+\mathbb{E}(Y) = \mu = \frac{\alpha}{\alpha + \beta}, \quad \operatorname{Var}(Y) = \frac{\alpha \beta}{(\alpha + \beta)^2(1 + \alpha + \beta)}.
+$$
+Then we can link mean $\mu$ to the linear predictor $\eta$ using any link function for binomial model. 
+```{r}
+library(mgcv)
+modb <- gam(survive / total ~ location + period,
+            family = betar(), data = troutegg)
+summary(modb)
+```
