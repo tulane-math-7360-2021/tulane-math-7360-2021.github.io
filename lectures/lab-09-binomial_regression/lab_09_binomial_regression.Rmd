@@ -1,0 +1,68 @@
+---
+title: "Lab 09 binomial regression"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Nov 10, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library(tidyverse)
+library(faraway)
+```
+
+# Exercise 3.1 from ELMR.
+
+The question concerns data from a case-control study of esophageal cancer in Ileet-Vilaine, France.
+The data is distributed with R and may be obtained along with a description of the variables by:
+
+```{r, eval = FALSE}
+data(esoph)
+help(esoph)
+```
+
+## (a) Plot the proportion of cases agianst each predictor using the size of the point to indicate the number of subject as seen in figure below.
+Comment on the relationships seen in the plots.
+```{r}
+lmod <- glm(chd ~ height + cigs, family = binomial, wcgs)
+gdf <- wcgs %>%
+  mutate(residuals = residuals(lmod), linpred = predict(lmod)) %>%
+  group_by(cigs) %>%
+  summarise(residuals = mean(residuals), count = n()) 
+gdf %>%
+  ggplot(mapping = aes(x = cigs, y = residuals, size = sqrt(count))) +
+  geom_point() +
+  theme_bw()
+```
+
+
+## (b) Fit a binomial GLM with interactions between all three preditors.
+Use AIC as a criterion to select a model using the `step` function.
+Which model is selected?
+
+
+## (c) 
+All three factors are ordered and so special contrasts have been used approriate for ordered factors involving linear, quadratic and cubic terms.
+Further simplification of the model may be possible by eliminating some of these terms.
+Use the `unclass` function to convert the factors to a numerical representation and check whether the model may be simplified.
+
+
+## (d)
+Does your final model fit the data? Is the test you make accurate for this data?
+
+
+## (e)
+Check for outlier in your final model.
+
+## (f)
+What is the predicted effect of moving one category higher in alcohol consumption?
+
+
+## (g)
+Compute a 95% confidence interval for this predicted effect.
+
