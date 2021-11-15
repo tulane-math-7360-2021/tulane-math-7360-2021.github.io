@@ -1,0 +1,220 @@
+---
+title: "Lab 9 binomial regression keys"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Nov 15, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r}
+rm(list = ls()) # clean-up workspace
+library(tidyverse)
+library(faraway)
+```
+
+# Exercise 3.1 from ELMR.
+
+The question concerns data from a case-control study of esophageal cancer in Ileet-Vilaine, France.
+The data is distributed with R and may be obtained along with a description of the variables by:
+
+```{r, eval = FALSE}
+data(esoph)
+help(esoph)
+```
+
+## (a) Plot the proportion of cases agianst each predictor using the size of the point to indicate the number of subject as seen in figure below.
+Comment on the relationships seen in the plots.
+```{r}
+lmod <- glm(chd ~ height + cigs, family = binomial, wcgs)
+gdf <- wcgs %>%
+  mutate(residuals = residuals(lmod), linpred = predict(lmod)) %>%
+  group_by(cigs) %>%
+  summarise(residuals = mean(residuals), count = n()) 
+gdf %>%
+  ggplot(mapping = aes(x = cigs, y = residuals, size = sqrt(count))) +
+  geom_point() +
+  theme_bw()
+```
+
+**Solutions**:
+```{r}
+esoph <- as_tibble(esoph)
+
+# age group
+esoph.age <- esoph %>%  
+  group_by(agegp) %>%
+  summarise(count = n(), total_cases = sum(ncases), total_controls = sum(ncontrols),
+              percentage=total_cases*100/(total_controls + total_cases))
+
+esoph.age %>%
+  ggplot(aes(x=agegp, y=percentage, color=agegp, size = total_controls + total_cases)) +
+  geom_point() +
+  labs(x= 'Age Groups', y= 'Percentage Of Cancer Cases', 
+       color = "Age Group", size = "Total Cases")+
+  theme_bw()
+
+# alcohol consumption
+esoph.alcgp <- esoph %>%  
+  group_by(alcgp) %>%
+  summarise(count = n(), total_cases = sum(ncases), total_controls = sum(ncontrols),
+              percentage=total_cases*100/(total_controls + total_cases))
+
+esoph.alcgp %>%
+  ggplot(aes(x=alcgp, y=percentage, color=alcgp, size = total_controls + total_cases)) +
+  geom_point() +
+  labs(x= 'Alcohol Consumption', y= 'Percentage Of Cancer Cases', 
+       color = "Alcohol Consumption", size = "Total Cases")+
+  theme_bw()
+
+# tobacco consumption
+esoph.tobgp <- esoph %>%  
+  group_by(tobgp) %>%
+  summarise(count = n(), total_cases = sum(ncases), total_controls = sum(ncontrols),
+              percentage=total_cases*100/(total_controls + total_cases))
+
+esoph.tobgp %>%
+  ggplot(aes(x=tobgp, y=percentage, color=tobgp, size = total_controls + total_cases)) +
+  geom_point() +
+  labs(x= 'Tobacco Consumption', y= 'Percentage Of Cancer Cases', 
+       color = "Tobacco Consumption", size = "Total Cases")+
+  theme_bw()
+```
+
+Percentage of cancer cases seems positively correlated with each of the variables.
+
+## (b) Fit a binomial GLM with interactions between all three preditors.
+Use AIC as a criterion to select a model using the `step` function.
+Which model is selected?
+
+**Solutions**
+```{r warning=FALSE}
+library(gtsummary)
+biglm <- glm(cbind(ncases, ncontrols) ~ (agegp + alcgp + tobgp)^2, family = binomial, data = esoph)
+biglm %>%
+  tbl_regression(intercept = TRUE)
+(smalllm <- step(biglm, trace = TRUE))
+```
+
+About the warning message, [read here](https://stackoverflow.com/questions/8596160/why-am-i-getting-algorithm-did-not-converge-and-fitted-prob-numerically-0-or) which suggests [this](http://math.yorku.ca/Who/Faculty/Monette/S-news/0027.html) too.
+
+
+## (c) 
+All three factors are ordered and so special contrasts have been used approriate for ordered factors involving linear, quadratic and cubic terms.
+Further simplification of the model may be possible by eliminating some of these terms.
+Use the `unclass` function to convert the factors to a numerical representation and check whether the model may be simplified.
+
+**Solutions**
+```{r}
+esoph.unclassed <- datasets::esoph %>%
+  as_tibble() %>%
+  mutate(agegp = unclass(agegp),
+         alcgp = unclass(alcgp),
+         tobgp = unclass(tobgp)) %>%
+  print()
+(lastlm <- glm(cbind(ncases, ncontrols) ~ agegp + alcgp + tobgp, family = binomial, data = esoph.unclassed))
+lastlm %>%
+  tbl_regression(intercept = TRUE)
+smalllm.unclassed <- step(lastlm, trace = TRUE)
+
+drop1(smalllm.unclassed, test = "Chisq")
+```
+
+No further variables are dropped by the backward selection.
+
+[Reference](https://ms.mcmaster.ca/~bolker/classes/s756/labs/glmlab.html)
+
+## (d)
+Does your final model fit the data? Is the test you make accurate for this data?
+
+**Solutions**
+```{r}
+pchisq(smalllm$deviance, smalllm$df.residual, lower = FALSE)
+drop1(smalllm, test = "Chi")
+```
+
+The large p-value indicates that the model has an adequate fit.
+All three predictors are significant at 0.05 level.
+
+## (e)
+Check for outlier in your final model.
+
+**Solutions**
+
+Plot deviance residuals against linear predictors to identify potential high residual observations.
+
+```{r}
+esoph %>%
+  mutate(devres = residuals(smalllm, type = "deviance"),
+         linpred = predict(smalllm, type = "link")) %>%
+  ggplot() +
+  geom_point(mapping = aes(x = linpred, y = devres)) +
+  labs(x = "Linear predictor", y = "Deviance residual")
+```
+
+Plot sorted hat values against half-normal quantiles to identify potential high leverage observations.
+
+```{r}
+halfnorm(hatvalues(smalllm))
+```
+```{r}
+esoph %>%
+  slice(c(51, 67))
+```
+
+Both points have lowest level of tobacco use.
+
+Plot sorted Cook distances against the half-normal quantiles to identify potential high influential observations.
+
+```{r}
+halfnorm(cooks.distance(smalllm))
+```
+
+```{r}
+esoph %>%
+  slice(c(71, 67))
+```
+
+One point has lowest level of tobacco use and the other has highest level of alcohol level.
+
+
+Look at overdispersion
+```{r}
+(sigma2 <- sum(residuals(smalllm, type = "pearson")^2) / smalllm$df.residual)
+```
+
+No evidence of overdispersion.
+
+Conclusion: we don't find apparent outliers.  The final model has an adequate fit.
+
+## (f)
+What is the predicted effect of moving one category higher in alcohol consumption?
+
+**solution**
+```{r}
+smalllm %>%
+  tbl_regression() %>%
+  bold_labels() %>%
+  bold_p(t = 0.05)
+
+
+(beta_hat <- unname(coef(smalllm)))
+
+# on the odds ratio scale
+exp(beta_hat[7:9])
+```
+
+## (g)
+Compute a 95% confidence interval for this predicted effect.
+
+
+```{r}
+# we focus on the 95% CI on the log odds ratios
+smalllm %>%
+  tbl_regression() %>%
+  bold_labels() %>%
+  bold_p(t = 0.05)
+```
