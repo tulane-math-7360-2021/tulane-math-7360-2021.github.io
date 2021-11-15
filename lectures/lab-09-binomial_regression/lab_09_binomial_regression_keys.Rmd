@@ -99,7 +99,7 @@ biglm %>%
 (smalllm <- step(biglm, trace = TRUE))
 ```
 
-About the warning message, [read here](https://stackoverflow.com/questions/8596160/why-am-i-getting-algorithm-did-not-converge-and-fitted-prob-numerically-0-or) which suggests [this](http://math.yorku.ca/Who/Faculty/Monette/S-news/0027.html) too.
+About the warning message, [read here](https://stackoverflow.com/questions/8596160/why-am-i-getting-algorithm-did-not-converge-and-fitted-prob-numerically-0-or).
 
 
 ## (c) 
