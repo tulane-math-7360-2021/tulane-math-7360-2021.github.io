@@ -1,0 +1,453 @@
+---
+title: "GLM"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Nov 16, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+
+```{r setup, include=FALSE}
+rm(list = ls()) # clean-up workspace
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+## Announcement
+
+- Just be happy
+
+## Acknowledgement
+
+Dr. Hua Zhou's [slides](https://ucla-biostat-200c-2020spring.github.io/slides/09-glm/glm.html)
+
+## Introduction
+
+Now we have learnt regression modeling of logistic, binomial and count responses. How about nonnegative real responses and so on? **Generalized linear model (GLM)** is a generic framework that encompasses normal regression, binomial regression, multinomial regression, and others. There are two essential components of the GLM framework: a **distribution** for response $Y$ and a **link** function that relates mean of $Y$ to covariates $x$.
+
+## Exponential family distribution
+
+### Definition
+
+In GLM, the distribution of $Y$ is from the exponential family of distributions of form
+$$
+  f(y \mid \theta, \phi) = \exp \left[ \frac{y \theta - b(\theta)}{a(\phi)} + c(y, \phi) \right].
+$$
+$\theta$ is called the **canonical parameter** or **natural parameter** and represents the location while $\phi$ is the **dispersion parameter** and represents the scale. Note the canonical parameter $\theta$ is not necessarily the mean $\mu$.  
+
+### Examples
+
+1. Normal or Gaussian:
+$$
+  f(y \mid \theta, \phi) = \frac{1}{\sqrt{2\pi}\sigma} \exp \left[ - \frac{(y - \mu)^2}{2\sigma^2} \right] = \exp \left[ \frac{y\mu - \mu^2/2}{\sigma^2} - \frac 12 \left( \frac{y^2}{\sigma^2} + \log(2\pi \sigma^2) \right) \right].
+$$
+So we can write
+\begin{eqnarray*}
+  \theta &=& \mu \\
+  \phi &=& \sigma^2 \\
+  a(\phi) &=& \phi \\
+  b(\theta) &=& \theta^2/2 \\
+  c(y, \phi) &=& -\frac 12 (y^2/\phi + \log(2\pi \phi)).
+\end{eqnarray*}
+
+2. Binomial: If we treat $Y$ as a binomial proportion; that is $nY \sim \text{Bin}(n, p)$, then the density is
+\begin{eqnarray*}
+  & & f(y \mid \theta, \phi) = \binom{n}{ny} p^{ny} (1 -p)^{n(1-y)} \\
+  &=& \exp \left[ ny \log p + n(1 - y) \log (1 - p) + \log \binom{n}{ny} \right] \\
+  &=& \exp \left[ \frac{y \log \frac{p}{1 - p} + \log (1 - p)}{1/n} + \log \binom{n}{ny} \right].
+\end{eqnarray*}
+So we see
+\begin{eqnarray*}
+  \theta &=& \log \frac{p}{1 - p} \\
+  \phi &=& 1 \\
+  a(\phi) &=& \frac{1}{n} \\
+  b(\theta) &=& - \log (1 - p) = \log (1 + \exp \theta) \\
+  c(y, \phi) &=& \log \binom{n}{ny}.
+\end{eqnarray*}
+
+3. Poisson:
+$$
+  f(y \mid \theta, \phi) = e^{-\mu} \frac{\mu^y}{y!} = \exp (y \log \mu - \mu - \log y!).
+$$
+So we have
+\begin{eqnarray*}
+  \theta &=& \log \mu \\
+  \phi &=& 1 \\
+  a(\phi) &=& 1 \\
+  b(\theta) &=& \exp \theta \\
+  c(y, \phi) &=& - \log y!.
+\end{eqnarray*}
+
+4. Gamma has density
+$$
+  f(y \mid \nu, \lambda) = \frac{1}{\Gamma(\nu)} \lambda^{\nu} y^{\nu - 1} e^{-\lambda y}, \quad y > 0,
+$$
+where $\nu$ is the shape parameter and $\lambda$ is the scale parameter. For the purpose of GLM, it's convenient to reparameterize by $\lambda = \nu / \mu$ to get
+$$
+  f(y) = \frac{1}{\Gamma(\nu)} \left( \frac{\nu}{\mu} \right)^{\nu} y^{\nu - 1} e^{-y\nu / \mu} = \exp \left\{ \frac{- y \mu^{-1} - \log \mu}{\nu^{-1}} + (\nu-1) \log y + \nu \log \nu - \log \Gamma(\nu) \right\}.
+$$
+Now $\mathbb{E}Y = \mu$ and $\operatorname{Var}(Y) = \mu^2 / \nu = (\mathbb{E} Y)^2 / \nu$. So we have
+\begin{eqnarray*}
+  \theta &=& - \mu^{-1} \\
+  \phi &=& \nu^{-1} \\
+  a(\phi) &=& \phi \\
+  b(\theta) &=& - \log (- \theta) \\
+  c(y, \phi) &=& (\phi^{-1} - 1) \log y - \phi^{-1} \log (\phi) - \log \Gamma(\phi^{-1}).
+\end{eqnarray*}
+Some books remove the minus sign in the canonical parameter/link which is fine provided we take account of this in any derivations. For the canonical link $\eta = \mu^{-1}$, the systematic component can only be non-negative, which could cause problems. Other possible link functions are log link $\eta = \log \mu$ and identity link $\eta = \mu$.
+
+5. Many other distributions.
+
+### Moments
+
+Exponential family distributions have mean and variance
+\begin{eqnarray*}
+  \mathbb{E}Y &=& \mu = b'(\theta) \\
+  \operatorname{Var}Y &=& \sigma^2 = b''(\theta) a(\phi).
+\end{eqnarray*}
+**Show this in Friday's Lab session**. Thus the function $b$ determines the moments of $Y$.
+
+## Link function
+
+- Given the **linear predictor** or **systematic component**
+$$
+  \eta = \mathbf{x}^T \boldsymbol{\beta},
+$$
+the **link function**, $g$, relates the mean $\mathbb{E} Y = \mu$ to the covariates
+$$
+  \eta = g(\mu).
+$$
+
+- In principal, any monotone, continuous, and differentiable function can be a link function. But there are some convenient and common choices for the standard GLMs.
+
+    * For Gaussian linear model, the identity link, $\eta = \mu$, is the obvious choice.  
+    
+    * For binomial model, we saw logit, probit and cloglog (complementary log-log transformation).  
+    
+    * For Poisson model, a standard choice is $\eta = \log \mu$.  
+
+- The **canonical link** has $g$ such that $\eta = g(\mu) = \theta$, the canonical parameter of the exponential family distribution. This means that $g(b'(\theta))=\theta$. If a canonical link is used, $\mathbf{X}^T \mathbf{y}$ is sufficient for $\boldsymbol{\beta}$. The canonical link is mathematically and computationally convenient and is often the natural choice of link.
+
+| Family           | Canonical Link                          | Variance Function |
+|------------------|-------------------------------|-------------------|
+| Normal           | $\eta=\mu$                    | 1                 |
+| Poisson          | $\eta=\log \mu$               | $\mu$             |
+| Bernoulli         | $\eta=\log \left( \frac{\mu}{1 - \mu} \right)$ | $\mu (1 - \mu)$   |
+| Gamma            | $\eta = \mu^{-1}$             | $\mu^2$           |
+| Inverse Gaussian | $\eta = \mu^{-2}$             | $\mu^3$           |
+
+## Fitting a GLM
+
+- GLM regreesion coefficients are estimated by MLE. Recall that the Newton-Raphson algorithm for maximizing a log-likelihood $\ell(\boldsymbol{\beta})$ proceeds as
+$$
+  \boldsymbol{\beta}^{(t+1)} = \boldsymbol{\beta}^{(t)} + s [- \nabla^2 \ell(\boldsymbol{\beta}^{(t)})]^{-1} \nabla \ell(\boldsymbol{\beta}^{(t)}),
+$$
+where $s>0$ is a step length, $\nabla \ell$ is the **score (gradient) vector**, and $-\nabla^2 \ell$ is the **observed information matrix** (negative Hessian). 
+
+- For GLM, 
+\begin{eqnarray*}
+  \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{y_i \theta_i - b(\theta_i)}{a(\phi)} + c(y_i, \phi) \\
+  \nabla \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{(y_i - \mu_i) \mu_i'(\eta_i)}{\sigma_i^2} \mathbf{x}_i \\
+  - \nabla^2 \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{[\mu_i'(\eta_i)]^2}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T - \sum_{i=1}^n \frac{(y_i - \mu_i) \mu_i''(\eta_i)}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T \\
+  & & + \sum_{i=1}^n \frac{(y_i - \mu_i) [\mu_i'(\eta_i)]^2 (d \sigma_i^{2} / d\mu_i)}{\sigma_i^4} \mathbf{x}_i \mathbf{x}_i^T.
+\end{eqnarray*}
+**Show this in Friday's Lab session**. For GLMs with canonical links, the second term and third term cancel using the fact
+$$
+\frac{d\mu_i}{d \eta_i} = \frac{d\mu_i}{d \theta_i} = \frac{d \, b'(\theta_i)}{d \theta_i} = b''(\theta_i) = \frac{\sigma_i^2}{a(\phi)}.
+$$
+Therefore for canonical link the negative Hessian is positive semidefinte and Newton's algorithm with line search is stable. 
+
+    See Biostat 216 [lecture notes](https://ucla-biostat216-2019fall.github.io/slides/16-matrixcalc/16-matrixcalc.html) for a refresher of matrix calculus.
+
+- How about non-canonical link? We use the expected (Fisher) information matrix
+$$
+  \mathbb{E} [- \nabla^2 \ell(\boldsymbol{\beta})] = \sum_{i=1}^n \frac{[\mu_i'(\eta_i)]^2}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T = \mathbf{X}^T \mathbf{W} \mathbf{X} \succeq 0,
+$$
+where $\mathbf{W} = \text{diag}([\mu_i'(\eta_i)]^2/\sigma_i^2)$. This modified Newton-Raphson algorithm is called the **Fisher scoring algorithm**. 
+
+- Take the Binomial logistic regression as an example
+\begin{eqnarray*}
+  \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n [y_i \log p_i + (n_i - y_i) \log (1 - p_i)] = \sum_{i=1}^n [y_i \mathbf{x}_i^T \boldsymbol{\beta} - n_i \log (1 + e^{\mathbf{x}_i^T \boldsymbol{\beta}})] \\
+  \nabla \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \left( y_i \mathbf{x}_i - n_i \frac{\exp \mathbf{x}_i^T \boldsymbol{\beta}}{1 + \exp \mathbf{x}_i^T \boldsymbol{\beta}} \mathbf{x}_i \right) = \sum_{i=1}^n (y_i - n_i p_i) \mathbf{x}_i = \mathbf{X}^T (\mathbf{y} - \widehat{\boldsymbol{\mu}}) \\
+  - \nabla^2 \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n n_i p_i (1 - p_i) \mathbf{x}_i \mathbf{x}_i^T = \mathbf{X}^T \mathbf{W} \mathbf{X}, \quad \mathbf{W} = \text{diag}(w_1, \ldots, w_n), w_i = n_i p_i (1 - p_i) \\
+  \mathbb{E} [- \nabla^2 \ell(\boldsymbol{\beta})] &=& - \nabla^2 \ell(\boldsymbol{\beta}).
+\end{eqnarray*}
+The Fisher scoring algorithmn proceeds as
+\begin{eqnarray*}
+  \boldsymbol{\beta}^{(t+1)} &=& \boldsymbol{\beta}^{(t)} + s(\mathbf{X}^T \mathbf{W}^{(t)} \mathbf{X})^{-1} \mathbf{X}^T (\mathbf{y} - \widehat{\boldsymbol{\mu}}^{(t)}) \\
+  &=& (\mathbf{X}^T \mathbf{W}^{(t)} \mathbf{X})^{-1} \mathbf{X}^T \mathbf{W}^{(t)} [\mathbf{X} \boldsymbol{\beta}^{(t)} + s (\mathbf{W}^{(t)})^{-1} (\mathbf{y} - \widehat{\boldsymbol{\mu}}^{(t)})] \\
+  &=& (\mathbf{X}^T \mathbf{W}^{(t)} \mathbf{X})^{-1} \mathbf{X}^T \mathbf{W}^{(t)} \mathbf{z}^{(t)},
+\end{eqnarray*} 
+where
+$$
+  \mathbf{z}^{(t)} = \mathbf{X} \boldsymbol{\beta}^{(t)} + s (\mathbf{W}^{(t)})^{-1} (\mathbf{y} - \widehat{\boldsymbol{\mu}}^{(t)})
+$$
+are **working responses**. In this sense, the Fisher scoring algorithm for GLM is also called the **IRWLS (iteratively reweighted least squares)**.
+
+- Recall the insecticide data `bliss` we used for binomial regression.
+```{r}
+library(tidyverse)
+library(faraway)
+bliss
+```
+Let's manually implement the first iteration of the Fisher scoring algorithm.
+```{r}
+p <- bliss$dead / 30
+eta <- logit(p)
+z <- eta
+w <- 30 * p * (1 - p)
+lmod <- lm(z ~ conc, weights = w, data = bliss)
+coef(lmod)
+```
+The Fisher scoring algorithm converges quickly after a few iterations.
+```{r}
+y = bliss$dead
+for (iter in 1:5) {
+  eta <- lmod$fit
+  p <- ilogit(eta)
+  w <- 30 * p * (1 - p)
+  z <- eta + (y - 30 * p) / w
+  lmod <- lm(z ~ conc, weights = w, data = bliss)
+  cat(iter, coef(lmod), "\n")
+}
+```
+Compare to the glm fit.
+```{r}
+glm(cbind(dead, alive) ~ conc, family = binomial, data = bliss) %>%
+  summary()
+```
+
+- After finding the MLE $\widehat{\boldsymbol{\beta}}$, the variance is obtained by
+$$
+\operatorname{Var} \widehat{\boldsymbol{\beta}} = \widehat{\phi} (\mathbf{X}^T \mathbf{W} \mathbf{X})^{-1}.
+$$
+```{r}
+xm <- model.matrix(lmod)
+wm <- diag(w)
+sqrt(diag(solve(t(xm) %*% wm %*% xm)))
+```
+
+## Hypothesis testing
+
+- When considering the choice of model for data, two extremes are the **null or intercept-only model** and the **full or saturated** model. 
+
+    * The **null model** means there's no relation between predictors and the response. Usually it means we fit a common mean $\mu$ for all $y$.  
+
+    * The **full model** means data is explained exactly. Typically it means we need to use $n$ parameters for $n$ data points.
+
+- To assess the **goodness of fit** of a model, we might consider likelihood ratio test. For independent observations from exponential family with $a_i(\phi) = \phi$, this simplifies to
+$$
+  \frac{D(\mathbf{y}, \widehat{\boldsymbol{\mu}})}{\phi} = \frac{2 \sum_i [y_i(\tilde \theta_i - \hat \theta_i) - b(\tilde \theta_i) + b(\hat \theta_i)]}{\phi},
+$$
+where $\tilde \theta$ are the estimates under the full model and $\hat \theta$ are the estimates under the model of interest. $D(\mathbf{y}, \widehat{\boldsymbol{\mu}})$ is called the **deviance** and $D(\mathbf{y}, \widehat{\boldsymbol{\mu}}) / \phi$ is the **scaled deviance**.
+
+- An alternative measure of goodness of fit is the **Pearson's $X^2$ statistic**
+$$
+  X^2 = \sum_i \frac{(y_i - \hat \mu_i)^2}{\operatorname{Var}(\hat \mu_i)}.
+$$
+
+| GLM              | Deviance                                                                             |
+|------------------|--------------------------------------------------------------------------------------|
+| Gaussian         | $\sum_i (y_i - \hat \mu_i)^2$                                                        |
+| Poisson          | $2\sum_i [y_i \log(y_i / \hat \mu_i) - (y_i - \hat \mu_i)]$                          |
+| Binomial         | $2 \sum_i [y_i \log(y_i / \hat \mu_i) + (n_i - y_i) \log((n_i - y_i)/(n_i - \hat \mu_i))]$ |
+| Gamma            | $2 \sum_i [- \log(y_i / \hat \mu_i) + (y_i - \hat \mu_i) / \hat \mu_i]$              |
+| Inverse Gaussian | $\sum_i (y_i - \hat \mu_i)^2 / (\hat \mu_i^2 y_i)$                                   |
+- For *goodness of fit* test, we use the fact that, under certain conditions, provided the model is correct, the scaled Deviance and the Pearson's $X^2$ statistic are both asymptotically $\chi^2$ with degrees of freedom equal to the difference of the numbers of identifiable parameters.
+
+- For Gaussian, $\phi$ is unknown so this test cannot be used. For binomial and Poisson, $\phi=1$ so the test is practical. However the accuracy of asymptotic approximation is dubious for smaller batch sizes. For binary responses, the approximation is worthless. 
+
+- To compare two nested models $\Omega$ and $\omega$, difference of the scaled deviance $D_\omega - D_\Omega$ is asymptotically $\chi^2$ with degrees of freedom equal to the difference in the number of identifiable parameters in the two models. For Gaussian model and other models where the disperson $\phi$ is unknown, we can insert an estimate of $\phi$ and compute an $F$ test
+$$
+  \frac{(D_\omega - D_\Omega) / (\text{df}_{\omega} - \text{df}_{\Omega})}{\hat \phi},
+$$
+where $\hat \phi = X^2 / (n-p)$ is a good estimate of the dispersion. For Gaussian, the F-test is exact. For other models, the F-test is approximate.
+
+- Recall the insecticide data `bliss` we used for binomial regression. The goodness of fit test by analysis deviance shows that this model fits data well. Comparing the fit to the null model also shows that the predictor `conc` is highly significant.
+```{r}
+bliss
+modl <- glm(cbind(dead, alive) ~ conc, family = binomial, data = bliss)
+summary(modl)
+```
+
+## Diagnostics
+
+### Residuals
+
+- **Pearson residual**
+$$
+  r_p = \frac{y - \hat \mu}{\sqrt{\operatorname{Var}(\hat \mu)}}.
+$$
+- **Deviance residual**
+$$
+  r_D = \text{sign}(y - \hat \mu) \sqrt{d_i},
+$$
+where $d_i$ are summands in the calculation of deviance.
+
+- These are different kinds of residuals from the Binomial regression of the intesticide data `bliss`.
+```{r}
+residuals(modl, type = "deviance") # deviance residuals
+residuals(modl, type = "pearson") # Pearson residuals
+residuals(modl, type = "response") # response - fitted values
+bliss$dead / 30.0 - fitted(modl)
+residuals(modl, type = "working") # working response
+modl$residuals
+```
+We mostly use the deviance residuals for diagnostics.
+
+### Leverage and influence
+
+- For GLM, the **hat matrix** is
+$$
+  \mathbf{H} = \mathbf{W}^{1/2} \mathbf{X} (\mathbf{X}^T \mathbf{W} \mathbf{X})^{-1} \mathbf{X}^T \mathbf{W}^{1/2},
+$$
+where $\mathbf{W}$ is the weight matrix at the fitted model. Diagonal elements of $\mathbf{H}$ are the leverages $h_i$. A larger value of leverage indicates that the fit may be sensitive to the response at case $i$. Its predictor values are unusual in some way. 
+```{r}
+influence(modl)$hat
+```
+
+- The **studentized residuals** are
+$$
+  r_{SD} = \frac{r_D}{\sqrt{\hat \phi (1 - h_i)}}.
+$$
+```{r}
+rstudent(modl)
+```
+
+- Leverage only measures the potential to affect the fit whereas measures of **influence** (change in coefficients if we omit a case) more directly access the effect of each case on the fit. 
+```{r}
+influence(modl)$coef
+```
+
+- Alternatively we can examine the **Cook statistics**
+$$
+  D_i = \frac{(\widehat{\boldsymbol{\beta}}_{(i)} - \widehat{\boldsymbol{\beta}})^T (\mathbf{X}^T \mathbf{W} \mathbf{X}) (\widehat{\boldsymbol{\beta}}_{(i)} - \widehat{\boldsymbol{\beta}})}{p \widehat \phi}.
+$$
+```{r}
+cooks.distance(modl)
+```
+
+### Residual plots
+
+- We revisit Poisson regression example on the Galápagos data.
+```{r}
+gala <- as_tibble(gala, rownames = "Island") %>%
+  print(n = Inf)
+modp <- glm(Species ~ . - Endemics - Island, family = poisson, data = gala)
+summary(modp)
+```
+
+- For GLM, it's better to plot the deviance residuals against the linear predictors $\widehat{\eta}$ rather than the predicted responses. We expect to see a constant variance of the deviance residuals.
+```{r}
+gala %>%
+  mutate(devres  = residuals(modp, type = "deviance"),
+         linpred = predict(modp, type = "link")) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = linpred, y = devres)) + 
+  labs(x = expression(hat(eta)), y = "Deviance residual")
+```
+If we plot response residuals $y_i - \widehat{\mu}_i$ against the linear predictor $\widehat{\eta}$, then we see variance increases with $\widehat{\mu}$ which is consistent with a Poisson model.
+```{r}
+gala %>%
+  mutate(resres  = residuals(modp, type = "response"),
+         linpred = predict(modp, type = "link")) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = linpred, y = resres)) + 
+  labs(x = expression(hat(eta)), y = "Response residual")
+```
+
+### Check linearity of predictors
+
+- Let's plot the response `Species` against the predictor `Area`. We see majority of islands have a small area with a few exceptions.
+```{r}
+gala %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = Area, y = Species))
+```
+
+- Log transform of `Area` reveals a curvilinear relationship.
+```{r}
+gala %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = log(Area), y = Species))
+```
+
+- Poisson regression uses a log link, which needs to be taken into account. Plotting the linearized response (working response)
+$$
+z = \eta + (y - \mu) \frac{d\eta}{d \mu}
+$$
+against log(Area) shows a linear relationship.
+```{r}
+gala %>%
+  mutate(eta = predict(modp, type = "link"),
+         mu  = predict(modp, type = "response"),
+         res = residuals(modp, type = "response")) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = log(Area), y = eta + res / mu)) + 
+  labs(x = "log(Area)", y = "Linearized response")
+```
+
+- From the same reasoning, we fit a model with log transformation of all predictors. We see a substantial reduction in deviance. 
+```{r}
+modpl <- glm(Species ~ log(Area) + log(Elevation) + log(Nearest) + log(Scruz + 0.5) + log(Adjacent), family = poisson, data = gala)
+summary(modpl)
+```
+
+### Half normal plot
+
+- Q-Q plot of the residuals is the standard way to check the normality assumption on the errors. For GLM, it's better use a half-normal plot that compares the sorted absolute residuals and the quantiles of the half-normal distribution
+$$
+  \Phi^{-1} \left( \frac{n+i}{2n + i} \right), \quad i=1,\ldots,n.
+$$
+The residuals are not expected to be normally distributed, so we are not looking for an approximate straight line. We only seek outliers which may be identified as points off the trend. A half-normal plot is better for this purpose because in a sense the resolution of the plot is doubled by having all the points in one tail.
+```{r}
+halfnorm(rstudent(modpl))
+gali <- influence(modpl)
+halfnorm(gali$hat)
+```
+
+## Sandwich estimation
+
+- To illustrate with the linear model, suppose we relax the assumption of the linear regression model $\mathbf{Y} \sim \text{N}(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})$ to
+$$
+\mathbf{Y} \sim \text{N}(\mathbf{X} \boldsymbol{\beta}, \boldsymbol{\Omega}),
+$$
+where $\boldsymbol{\Omega}$ is an unknow covariance matrix. We still use the least squares solution estimate
+$$
+\widehat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}.
+$$
+Then
+$$
+\operatorname{Var} \widehat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} (\mathbf{X}^T \boldsymbol{\Omega} \mathbf{X}) (\mathbf{X}^T \mathbf{X})^{-1}.
+$$
+
+- For correct inference, we would like to plug in an estimate of $\boldsymbol{\Omega}$ and use this **sandwich estimator**.
+
+- Generalization to GLM is similar.
+
+```{r}
+library(sandwich)
+modg <- glm(Species ~ . - Endemics - Island, family = poisson, data = gala) 
+modg %>%
+  vcovHC() %>%
+  diag() %>%
+  sqrt()
+
+# estimate overdispersion parameter
+(dp <- sum(residuals(modg, type = "pearson")^2) / modg$df.residual)
+summary(modg, dispersion = dp)
+```
+Standard errors are closer to those from the overdispersion Poisson model.
+
+## Robust estimation
+
+- CUBIF (conditionally unbiased inluence function) method bounds the maximum influence each observation can exert.
+
+```{r, eval = F}
+library(robust)
+glmRob(Species ~ log(Area) + log(Adjacent), family = poisson, data = gala) %>%
+  summary()
+```
