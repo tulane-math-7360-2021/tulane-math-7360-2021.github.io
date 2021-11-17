@@ -271,6 +271,8 @@ where $\hat \phi = X^2 / (n-p)$ is a good estimate of the dispersion. For Gaussi
 bliss
 modl <- glm(cbind(dead, alive) ~ conc, family = binomial, data = bliss)
 summary(modl)
+
+1-pchisq(deviance(modl),df.residual(modl))
 ```
 
 ## Diagnostics
