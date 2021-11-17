@@ -1,0 +1,63 @@
+---
+title: "Lab 10 GLM keys"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Nov 17, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+
+We practice some derivations in this lab session
+
+## Q1
+
+The **negative binomial distribution** has probability mass function
+$$
+\mathbb{P}(Y = y) = \binom{y + r - 1}{r - 1} (1 - p)^r p^y, \quad y = 0, 1, \ldots
+$$
+Show that $\mathbb{E}Y = \mu = rp / (1 - p)$ and $\operatorname{Var} Y = r p / (1 - p)^2$.
+
+
+
+
+## Q2 
+
+In GLM, the distribution of $Y$ is from the exponential family of distributions of form
+$$
+  f(y \mid \theta, \phi) = \exp \left[ \frac{y \theta - b(\theta)}{a(\phi)} + c(y, \phi) \right].
+$$
+Show that exponential family distributions have mean and variance
+\begin{eqnarray*}
+  \mathbb{E}Y &=& \mu = b'(\theta) \\
+  \operatorname{Var}Y &=& \sigma^2 = b''(\theta) a(\phi).
+\end{eqnarray*}
+Thus the function $b$ determines the moments of $Y$.
+
+
+
+
+## Q3
+
+For GLM, 
+\begin{eqnarray*}
+  \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{y_i \theta_i - b(\theta_i)}{a(\phi)} + c(y_i, \phi) \\
+  \nabla \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{(y_i - \mu_i) \mu_i'(\eta_i)}{\sigma_i^2} \mathbf{x}_i \\
+  - \nabla^2 \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{[\mu_i'(\eta_i)]^2}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T - \sum_{i=1}^n \frac{(y_i - \mu_i) \mu_i''(\eta_i)}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T \\
+  & & + \sum_{i=1}^n \frac{(y_i - \mu_i) [\mu_i'(\eta_i)]^2 (d \sigma_i^{2} / d\mu_i)}{\sigma_i^4} \mathbf{x}_i \mathbf{x}_i^T.
+\end{eqnarray*}
+
+Show that for GLMs with canonical links, the second term and third term in the Hessian equation cancel using the fact
+$$
+\frac{d\mu_i}{d \eta_i} = \frac{d\mu_i}{d \theta_i} = \frac{d \, b'(\theta_i)}{d \theta_i} = b''(\theta_i) = \frac{\sigma_i^2}{a(\phi)}.
+$$
+Therefore for canonical link the negative Hessian is positive semidefinite and Newton's algorithm with line search is stable.
+
+$$
+  - \nabla^2 \ell(\boldsymbol{\beta}) = \sum_{i=1}^n \frac{[\mu_i'(\eta_i)]^2}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T = \mathbf{X}^T \mathbf{W} \mathbf{X} \succeq 0,
+$$
+
+
