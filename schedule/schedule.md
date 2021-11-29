@@ -39,5 +39,5 @@ Topics:
 | **11/08** Logistic regression [[Rmd](../lectures/16-logistic_regression/logistic_regression.Rmd)][[HTML](../lectures/16-logistic_regression/logistic_regression.html)] | **11/10** Binomial regression [[Rmd](../lectures/17-binomial_regression/binomial_regression.Rmd)][[HTML](../lectures/17-binomial_regression/binomial_regression.html)] | **11/12** Lab 9 binomial regression [[Rmd](../lectures/lab-09-binomial_regression/lab_09_binomial_regression.Rmd)][[HTML](../lectures/lab-09-binomial_regression/lab_09_binomial_regression.html)] | |
 | **11/15** Count regression [[Rmd](../lectures/18-count_regression/count_regression.Rmd)][[HTML](../lectures/18-count_regression/count_regression.html)] | **11/17** GLM [[Rmd](../lectures/19-GLM/GLM.Rmd)][[HTML](../lectures/19-GLM/GLM.html)] | **11/19** Lab 10 GLM [[Rmd](../lectures/lab-10-GLM/lab_10_GLM.Rmd)][[HTML](../lectures/lab-10-GLM/lab_10_GLM.html)] | |
 | **11/22** Thanksgiving Holiday |  **11/24** Thanksgiving Holiday |  **11/26** Thanksgiving Holiday | |
-
+| **11/29** Neural Networks [[Rmd](../lectures/20-Neural_Network/neural_network.Rmd)][[HTML](../lectures/20-Neural_Network/neural_network.html)]| | | |
 
