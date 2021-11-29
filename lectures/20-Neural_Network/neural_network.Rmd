@@ -18,7 +18,9 @@ knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
 
 ## Announcement
 
-- Report due this Friday
+- Project report due this Friday
+
+- Course evaluation started, please take time to fill it out
 
 ## Acknowledgement
 
