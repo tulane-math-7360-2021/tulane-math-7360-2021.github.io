@@ -1,0 +1,131 @@
+---
+title: "Lab 11 Neural Networks"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Dec 3, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+```{r setup, include=FALSE}
+rm(list = ls()) # clean-up workspace
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+```{r}
+sessionInfo()
+library(tidyverse)
+```
+
+We apply neural network for handwritten digit recognition in this lab.
+
+## Data
+We use the **MNIST** database (Modified National Institute of Standards and Technology database) is a large database of handwritten digits ($28 \times 28$) that is commonly used for training and testing machine learning algorithms.
+
+- 60,000 training images, 10,000 testing images. 
+
+You can prepare the data by the following code
+
+```{r}
+library(keras)
+mnist <- dataset_mnist(path = "mnist.npz")
+x_train <- mnist$train$x
+y_train <- mnist$train$y
+x_test <- mnist$test$x
+y_test <- mnist$test$y
+```
+Training set:
+```{r}
+dim(x_train)
+dim(y_train)
+```
+
+Let's take a look over the first 10 images in the training set.
+
+```{r}
+for (i in 1:10) {
+  (image(t(x_train[i, 28:1,]), useRaster=TRUE, axes=FALSE, col=grey(seq(0, 1, length = 256)), main = y_train[i]))
+}
+```
+
+Vectorize $28 \times 28$ images into $784$-vectors and scale entries to [0, 1]:
+```{r}
+# reshape
+x_train <- array_reshape(x_train, c(nrow(x_train), 784))
+x_test <- array_reshape(x_test, c(nrow(x_test), 784))
+# rescale
+x_train <- x_train / 255
+x_test <- x_test / 255
+dim(x_train)
+dim(x_test)
+```
+
+Encode $y$ as binary class matrix:
+```{r}
+y_train <- to_categorical(y_train, 10)
+y_test <- to_categorical(y_test, 10)
+dim(y_train)
+dim(y_test)
+head(y_train)
+```
+
+## Q0
+
+Fit a multinomial logit regression model to the training set and test the accuracy with the test set.
+Plot the first 10 digits in the test set and compare with their predicted value.
+
+```{r}
+mlogit <- keras_model_sequential() 
+mlogit %>% 
+  layer_dense(units = 10, activation = 'softmax', input_shape = c(784))
+summary(mlogit)
+```
+
+```{r}
+# compile model
+mlogit %>% compile(
+  loss = 'categorical_crossentropy',
+  optimizer = optimizer_rmsprop(),
+  metrics = c('accuracy')
+)
+```
+```{r}
+# fit model
+mlogit_history <- mlogit %>% fit(
+  x_train, y_train, 
+  epochs = 20, batch_size = 128, 
+  validation_split = 0.2
+)
+```
+
+```{r}
+# Evaluate model performance on the test data:
+mlogit %>% evaluate(x_test, y_test)
+```
+Generate predictions on new data:
+```{r}
+y_predict <- mlogit %>% predict(x_test) %>% k_argmax() %>% as.array()
+for (i in 1:10) {
+  (image(t(mnist$test$x[i, 28:1,]), useRaster=TRUE, axes=FALSE, col=grey(seq(0, 1, length = 256)), main = y_predict[i]))
+}
+```
+
+
+## Q2
+
+Fit a multi-layer neural network and perform the task in Q0 again.
+
+You can refer to this example code. <https://tensorflow.rstudio.com/guide/keras/examples/mnist_mlp/>
+
+## Q3
+
+Fit a convolutional neural network and perform the same task in Q0.
+
+You can refer to this example code. <https://tensorflow.rstudio.com/guide/keras/examples/mnist_cnn/>
+
+## Q4
+
+Summarize the prediction accuracy and runtime differences between these models.
