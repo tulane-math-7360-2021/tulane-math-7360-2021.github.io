@@ -1,0 +1,151 @@
+---
+title: "Lab 10 GLM keys"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Nov 29, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+We practice some derivations in this lab session
+
+## Q1
+
+The **negative binomial distribution** has probability mass function
+$$
+\mathbb{P}(Y = y) = \binom{y + r - 1}{r - 1} (1 - p)^r p^y, \quad y = 0, 1, \ldots
+$$
+Show that $\mathbb{E}Y = \mu = rp / (1 - p)$ and $\operatorname{Var} Y = r p / (1 - p)^2$.
+
+**Solution**
+
+- Mean
+
+\begin{eqnarray*}
+\mathbb{E}Y 
+&=& \sum_{y=0}^{\infty}{y \binom{y + r - 1}{r - 1} (1 - p)^r p^y} \\
+&=& \sum_{y=1}^{\infty}{\frac{(y+r-1)!}{(y-1)!(r-1)!}(1 - p)^r p^y} \\
+&=& \sum_{y^{*}=0}^{\infty}{p \frac{(y^{*}+r)!}{y^{*}!(r-1)!}(1 - p)^r p^{y^{*}}} \\
+&=& \sum_{y^{*}=0}^{\infty}{ \frac{rp}{1-p} \binom{y^{*} + r}{r}(1 - p)^{r+1} p^{y^{*}}} \\
+&=& \frac{rp}{1-p} \\
+\end{eqnarray*}
+
+- Variance
+
+\begin{eqnarray*}
+\operatorname{Var} Y &=& \mathbb{E}Y^2 - (\mathbb{E}Y)^2 \\
+\\
+\mathbb{E}Y^2 
+&=& \sum_{y=0}^{\infty}{y^2 \binom{y + r - 1}{r - 1} (1 - p)^r p^y} \\
+&=& \sum_{y=1}^{\infty}{y \frac{(y+r-1)!}{(y-1)!(r-1)!}(1 - p)^r p^y} \\
+&=& \sum_{y=1}^{\infty}{(y - 1 + 1) \frac{(y+r-1)!}{(y-1)!(r-1)!}(1 - p)^r p^{y}} \\
+&=& \sum_{y=2}^{\infty}{\frac{(y+r-1)!}{(y-2)!(r-1)!}(1 - p)^r p^{y}} + \sum_{y=1}^{\infty}{\frac{(y+r-1)!}{(y-1)!(r-1)!}(1 - p)^r p^y} \\
+&=& \sum_{y=0}^{\infty}{\frac{(y+r+1)!}{y!(r-1)!} (1 - p)^r p^y p^2} + \mathbb{E}Y\\
+&=& \sum_{y=0}^{\infty}{\frac{r(r+1)p^2}{(1-p)^2} \binom{y + r + 1}{r + 1} (1 - p)^{r+2} p^y} + \mathbb{E}Y \\
+&=& \frac{r(r+1)p^2}{(1-p)^2} + \frac{rp}{1-p} \\
+\\
+\operatorname{Var} Y 
+&=& \frac{r(r+1)p^2}{(1-p)^2} + \frac{rp}{1-p} - \frac{r^2p^2}{(1-p)^2} \\
+&=& \frac{rp}{(1-p)^2}
+\end{eqnarray*}
+
+
+## Q2 
+
+In GLM, the distribution of $Y$ is from the exponential family of distributions of form
+$$
+  f(y \mid \theta, \phi) = \exp \left[ \frac{y \theta - b(\theta)}{a(\phi)} + c(y, \phi) \right].
+$$
+Show that exponential family distributions have mean and variance
+\begin{eqnarray*}
+  \mathbb{E}Y &=& \mu = b'(\theta) \\
+  \operatorname{Var}Y &=& \sigma^2 = b''(\theta) a(\phi).
+\end{eqnarray*}
+Thus the function $b$ determines the moments of $Y$.
+
+**Solution**
+
+ELMR p.152 - p.153
+
+The log-likelihood for a single $y$ is 
+
+$$
+\ell(\boldsymbol{\theta}) = \frac{y \theta - b(\theta)}{a(\phi)} + c(y, \phi)
+$$
+taking derivatives with respect to $\theta$ gives
+
+$$
+\ell '(\boldsymbol{\theta}) = \left(y  - b'(\theta_i)\right)/{a(\phi)}
+$$
+taking expectation over $y$ gives
+
+$$
+\mathbb{E} \left[\ell '(\boldsymbol{\theta})\right] = \left(\mathbb{E}Y  - b'(\theta_i)\right)/{a(\phi)}
+$$
+From general likelihood theory, we know $\mathbb{E} \left[\ell '(\boldsymbol{\theta})\right] = 0$ at the true value of $\theta$
+
+$$
+\mathbb{E} \left[\ell '(\boldsymbol{\theta})\right] = 0 \Rightarrow \mathbb{E}Y  = b'(\theta_i)
+$$
+Now, the second derivative
+
+$$
+\ell ''(\boldsymbol{\theta}) = - b''(\theta_i)/{a(\phi)}
+$$
+General likelihood theory tells us
+
+\begin{eqnarray*}
+\mathbb{E} \left[\ell ''(\boldsymbol{\theta}) \right] &=& - \mathbb{E} \left[ \ell '(\boldsymbol{\theta})^2 \right] \\
+  b''(\theta_i)/{a(\phi)} 
+  &=& \mathbb{E} \left[ \left(Y  - b'(\theta_i)\right)^2 \right]/{a^2(\phi)} \\
+  &=& \mathbb{E} \left[ \left(Y  - \mathbb{E}Y \right)^2 \right]/{a^2(\phi)} \\
+\Rightarrow   \operatorname{Var}Y &=& b''(\theta) a(\phi).
+\end{eqnarray*}
+
+
+
+
+
+## Q3
+
+For GLM, 
+\begin{eqnarray*}
+  \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{y_i \theta_i - b(\theta_i)}{a(\phi)} + c(y_i, \phi) \\
+  \nabla \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{(y_i - \mu_i) \mu_i'(\eta_i)}{\sigma_i^2} \mathbf{x}_i \\
+  - \nabla^2 \ell(\boldsymbol{\beta}) &=& \sum_{i=1}^n \frac{[\mu_i'(\eta_i)]^2}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T - \sum_{i=1}^n \frac{(y_i - \mu_i) \mu_i''(\eta_i)}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T \\
+  & & + \sum_{i=1}^n \frac{(y_i - \mu_i) [\mu_i'(\eta_i)]^2 (d \sigma_i^{2} / d\mu_i)}{\sigma_i^4} \mathbf{x}_i \mathbf{x}_i^T.
+\end{eqnarray*}
+
+Show that for GLMs with canonical links, the second term and third term in the Hessian equation cancel using the fact
+$$
+\frac{d\mu_i}{d \eta_i} = \frac{d\mu_i}{d \theta_i} = \frac{d \, b'(\theta_i)}{d \theta_i} = b''(\theta_i) = \frac{\sigma_i^2}{a(\phi)}.
+$$
+Therefore for canonical link the negative Hessian is positive semidefinite and Newton's algorithm with line search is stable.
+
+$$
+  - \nabla^2 \ell(\boldsymbol{\beta}) = \sum_{i=1}^n \frac{[\mu_i'(\eta_i)]^2}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T = \mathbf{X}^T \mathbf{W} \mathbf{X} \succeq 0,
+$$
+
+**Solution**
+
+We only need to show
+
+$$
+\mu_i''(\eta_i) = \left[ \mu_i'(\eta_i) \right]^2 \frac{d \sigma_i^{2}}{ d\mu_i} \big/ \sigma_i^2
+$$
+Recall that for canonical link, $\eta_i = g(\mu_i) = \theta_i$ and we start by taking derivative with respect to $\theta_i$ on $\mu_i' =  \frac{d\mu_i}{d \theta_i} = \frac{\sigma_i^2}{a(\phi)}$.
+
+
+\begin{eqnarray*}
+\mu_i'' 
+&=& \frac{1}{a(\phi)} \frac{d \sigma_i^2}{d \theta_i} \\
+&=& \frac{1}{a(\phi)} \frac{d \sigma_i^2}{d \mu_i} \frac{d \mu_i}{d \theta_i} \\
+&=& \frac{\sigma_i^2}{a^2(\phi)} \frac{d \sigma_i^2}{d \mu_i} \\
+&=& \left[ \mu_i'(\eta_i) \right]^2 \frac{d \sigma_i^{2}}{ d\mu_i} \big/ \sigma_i^2 \\
+\end{eqnarray*}
+
+
+
