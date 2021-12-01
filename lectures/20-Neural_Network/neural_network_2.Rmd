@@ -18,6 +18,8 @@ knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
 
 ## Announcement
 
+- Course evaluation (2/19)
+
 - Project mid-report due this week
 
 - HW3 due next week
