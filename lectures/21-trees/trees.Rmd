@@ -1,0 +1,467 @@
+---
+title: "Trees"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Dec 6, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+
+
+```{r setup, include=FALSE}
+rm(list = ls()) # clean-up workspace
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+## Announcement
+
+- Course evaluations (6/19)
+
+- Remember to submit your mid-term project report to GitHub.
+  - I will read them later today
+  - I was going to read them last weekend if all of them were there...
+
+- Lab 11 is optional
+  - If you were able to get TensorFlow and Keras to run with python, consider trying the lab out in python 
+    - <https://www.tensorflow.org/datasets/keras_example>
+  - After all, we are doing API calls to the underlying C++ TensorFlow library.
+    - <https://keras.io/api/>
+    - <https://tensorflow.rstudio.com/reference/keras/>
+  - For M1 mac users, sorry I gave up on trying
+
+- Presentations will be on zoom starting this Friday
+  - link: <https://tulane.zoom.us/j/91892909048?pwd=YUkxdHErUVkwOG83dU82QXNEUm52dz09>
+  - more flexible for this long semester
+  - will send the same link again on Thursday
+  - illustrate your project to your peers
+  - Do not assume people ever read your paper
+
+- Go over HW3 keys on Wednesday?
+
+## Acknowledgement
+
+Extending the linear model with R chapter 16
+
+
+## Air pollution data
+
+We apply regression tree methodology to study the relationship between atmospheric ozone concentration and meteorology in Los Angeles area in 1976.
+The response is Ozone ($O_3$), the atmospheric ozone concentration on a particular day.
+First, take a look over the data:
+
+```{r}
+library(faraway)
+library(tidyverse)
+
+ozone %>%
+  ggplot(mapping = aes(x=temp, y=O3)) + 
+  geom_point(size=1) +
+  geom_smooth()
+
+ozone %>%
+  ggplot(aes(x=ibh, y=O3)) +
+  geom_point(size=1) +
+  geom_smooth() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ozone %>%
+  ggplot(aes(x=ibt, y=O3)) +
+  geom_point(size=1) +
+  geom_smooth()
+
+```
+
+- An examination of the data reveals several nonlinear relationships indicating that a linear regression might not be appropriate without the addition of some transformation.
+
+
+## Fit a regression tree
+
+```{r}
+library(rpart)
+(tmod <- rpart(O3 ~ ., ozone))
+```
+
+- The first split (nodes 2 and 3) is on temperature:  
+
+    - 215 observations have temperatures less than 67.5 with a mean response value of $7.4$.
+    
+    - 116 observations have temperatures greater than 67.5 with a mean response value of $20$.
+
+- The total RSS has been reduced from $21115.00$ to $4114.30 + 5478.40 = 9592.70$.
+
+More substantial output
+
+```{r, eval = FALSE}
+summary(tmod)
+```
+
+Graphical displays
+
+```{r}
+plot(tmod)
+text(tmod)
+
+plot(tmod,compress=T,uniform=T,branch=0.4)
+text(tmod)
+
+library(rpart.plot)
+rpart.plot(tmod, type = 2)
+```
+
+## Recursive partitioning regression algorithm
+
+1. Consider all partitions of the region of the predictors into two regions parallel to one of the axes. $N-1$ possible partitions for each predictor with a total of $(N-1)p$ partitions.
+
+2. For each partition, take the mean of the responses in the partition and compute residual sum of squares (RSS).  Pick the partition that minimizes the RSS among all available partitions.
+$$
+RSS(partition) = RSS(part_1) + RSS(part_2) = \sum_{y_i \in part_1} (y_i - \bar y_{part_1})^2 + \sum_{y_j \in part_2} (y_j - \bar y_{part_2})^2
+$$
+
+<!-- \begin{eqnarray*} -->
+<!--   RSS(partition) &=& RSS(part_1) + RSS(part_2) \\ -->
+<!--   &=& \sum_{y_i \in part_1} (y_i - \bar y_{part_1})^2 + \sum_{y_j \in part_2} (y_j - \bar y_{part_2})^2 \\ -->
+<!-- \end{eqnarray*} -->
+
+3. Sub-partition the partitions in a recursive manner.
+
+
+- For categorical predictors with $L$ levels:
+
+    - $L-1$ possible splits for an ordered factor
+    
+    - $2^{L-1} - 1$ possible splits for an unordered factor
+    
+- Monotonely transforming a quantitative predictor makes no difference.
+
+- Transforming response will make a difference because of the computation of RSS.
+
+- Easy interpretation
+
+## Missing values
+
+When training, we may simply exclude points with missing values provided we weight appropriately.
+
+If we believe being missing expresses some information, then
+
+  - for categorical predictor, assign an additional factor for missing values
+  - for continuous predictors, could discretize data into ranges so that missing value becomes an additional factor
+  
+When predict the response for a new value with missing values
+
+  - drop the prediction down through the tree until the missing values prevent us from going further
+  
+  - use the mean value for the internal node to proceed
+
+
+
+
+## Diagonostics
+
+
+```{r}
+plot(jitter(predict(tmod)),residuals(tmod),xlab="Fitted",ylab="Residuals")
+abline(h=0)
+
+qqnorm(residuals(tmod))
+qqline(residuals(tmod))
+```
+
+## Prediction
+
+Let's predict the response for a new value, using the median value as an example
+
+```{r}
+(x0 <- apply(ozone[,-1], 2, median))
+rpart.plot(tmod, type = 2)
+predict(tmod,data.frame(t(x0)))
+```
+
+
+## Tree pruning
+
+- The recursive partitioning algorithm describes how to grow the tree.
+
+- How to decide the optimal size for the tree?
+
+- _Greedy strategy_
+
+    - keep partitioning until the reduction in overall cost (RSS) is not reduced by more than $\epsilon$.
+    
+    - can be difficult to set $\epsilon$ value.
+
+- _Cross-validation_ for more general model selection
+
+    - *leave one out*: For a given tree, leave out one observation, recalculate the tree and predict the left-over observation. Repeat for all observations
+    
+    - $\sum_{j=1}^n (y_j - \hat f_{(j)}(x_j))^2$ where $\hat f_{(j)}$ denotes the predicted value of input $x_j$ given the tree given built without $x_j$
+    
+    - k-fold cross-validation randomly divide the data into k equal parts and use $k-1$ parts to predict the cases in the remaining part. k = 10 is typical choice.
+  
+- _Cost-complexity function_ for trees further narrow down the set of trees worth validating
+
+    $$
+    CC(Tree) = \sum_{\mbox{terminal nodes: i}} RSS_i + \lambda(number of terminal nodes)
+    $$
+    
+    - large $\lambda$ value favous small trees
+    
+- Pruning the tree
+
+    - use `cp` (ratio of $\lambda$ to $RSS$ of the root tree) to get a large tree
+
+    ```{r}
+    set.seed(7360)
+    tmode <- rpart(O3 ~ ., ozone, cp = 0.001)
+    printcp(tmode)
+    ```
+    
+    - Can select the size of the tree by minimizing the value of `xerror` with corresponding value of `cp`
+    
+        - take the nine-split tree
+    
+    - can select the smallest tree with a CV error within one standard error of the minimum.
+    
+        - $0.350 + 0.035 = 0.385$, take the seven-split tree.
+        
+    - visulize the CV error
+    
+    ```{r}
+    plotcp(tmod)
+    ```
+    ```{r}
+    library(rpart.plot)
+    rpart.plot(tmod, type = 2)
+    ```
+    
+    Learn more about `rpart.plot` from [Stephen Milborrow's pdf](http://www.milbo.org/rpart-plot/prp.pdf)
+    
+    - Select a tree with five splits, effectively six parameters
+    
+    ```{r}
+    tmodr <- prune.rpart(tmod, 0.0153249)
+    1-sum(residuals(tmodr)^2)/sum((ozone$O3-mean(ozone$O3))^2)
+    ```
+    
+    - Compare to a linear regression with 6 parameters
+    
+    ```{r}
+    alm <- lm(O3 ~ vis + doy + ibt + humidity + temp, data = ozone)
+    summary(alm)
+    ```
+
+
+- Tree models are not optimal for prediction or explanation purposes.
+
+## Random Forests
+
+- A method that builds on trees to form a forest
+
+- _Random forest_ method uses bootstrap aggregating (known as _bagging_).  For $b=1, \dots, B$
+
+    - Draw a sample with replacement from ($X$, $Y$) to generate ($X_b$, $Y_b$)
+    
+    - fit a regression tree to ($X_b$, $Y_b$)
+    
+    - For cases not drawn in bootstrap sample, compute the mean squared error of prediction
+
+- The $B$ trees form the forest.  New predictions can be made by feeding predictor value into each tree and average the predictions.
+
+- Subsample predictors at each node to reduce the correlations among the trees. 
+
+    - Default choice of subsample size is $\sqrt{p}$
+    
+
+### Fit a random forest
+
+```{r}
+library(randomForest)
+fmod <- randomForest(O3 ~ ., ozone)
+```
+
+- plot the mean squared error (MSE) of prediction as number of trees $B$ increases
+
+```{r}
+plot(fmod, main = "")
+```
+
+- Use cross-validation
+    
+    - start with full sample $p = 9$
+    
+    - move on to $step \times p$ recursively, rounding at each stage
+    
+    - pick up best `nvars` for `mtry`
+
+```{r}
+cvr <- rfcv(ozone[,-1],ozone[,1],step=0.9)
+cbind(nvars=cvr$n.var,MSE=cvr$error.cv)
+```
+
+- choose `mtry` = 9, compute $R^2$ value
+
+```{r}
+fmod <- randomForest(O3 ~ ., ozone, mtry=9)
+1-sum((fmod$predict-ozone$O3)^2)/sum((ozone$O3-mean(ozone$O3))^2)
+```
+
+- _partial dependence plot_ compute the predicted value for every case in the dataset excluding the predictor of interest and average over the predicted values
+
+```{r}
+partialPlot(fmod, ozone, "temp", main="")
+```
+
+- A measure of importance over predictors
+
+```{r}
+importance(fmod)
+```
+
+
+## Classification trees
+
+- Responses are categorical
+
+- A split should divide the observations within a node so that class types within a split are mostly of one kind
+
+- Let $n_{ik}$ be the number of observations of type $k$ within terminal node $i$ and $p_{ik}$ be the observed proportion of type $k$ within node $i$.
+
+- Several measure of _purity_ of the node:
+
+    - Deviance:
+    
+    $$
+    D_i = -2 \sum_{k}n_{ik}\log p_{ik}
+    $$
+
+    - Entropy:
+    
+    $$
+    D_i = - \sum_{k} p_{ik} \log p_{ik}
+    $$
+    
+    - Gini index:
+    
+    $$
+    D_i = 1 - \sum_k p_{ik}^2
+    $$
+
+- All measures are minimized when all members of the node are of the same type
+
+### Kangaroo data
+
+Identification of the sex and species of an historical specimen of kangaroo (`kanga` dataset in faraway package).
+
+  - Three possible species: _Giganteus_, _Melanops_ and _Fuliginosus_
+  
+  - The sex of the animal
+  
+  - 18 skull measurements
+
+We form separate trees for identifying the sex and species.
+
+- read in data
+
+```{r}
+data(kanga, package="faraway")
+x0 <- c(1115,NA,748,182,NA,NA,178,311,756,226,NA,NA,NA,48,1009,NA,204,593)
+```
+
+- exclude all variables that are missing in the test case
+
+```{r}
+kanga <- kanga[,c(T,F,!is.na(x0))]
+kanga[1:2,]
+```
+
+- First, look at missing values in the training set
+
+```{r}
+apply(kanga,2,function(x) sum(is.na(x)))
+```
+
+- Compute the pairwise correlation of these variables with other variables
+
+```{r}
+round(cor(kanga[,-1],use="pairwise.complete.obs")[,c(3,9)],2)
+```
+
+- Remove the two variables and remaining missing cases
+
+```{r}
+newko <- na.omit(kanga[,-c(4,10)])
+dim(newko)
+```
+
+- visualize the class separation over the two variables
+
+```{r}
+ggplot(newko, aes(x=zygomatic.width,y=foramina.length,shape=species, color = species)) +
+  geom_point() +
+  theme(legend.position = "top", legend.direction ="horizontal", legend.title=element_blank())
+```
+
+### Fit a classification tree
+
+- Gini's index is the default choice of criterion
+
+```{r}
+set.seed(123)  # try with 7360
+kt <- rpart(species ~ ., data=newko,control = rpart.control(cp = 0.001))
+printcp(kt)
+```
+
+- Select the six-split tree and plot
+
+```{r}
+(ktp <- prune(kt,cp=0.0211))
+
+rpart.plot(ktp, type = 2)
+```
+
+- Compute the misclassification error
+
+```{r}
+ (tt <- table(actual=newko$species, predicted=predict(ktp, type="class")))
+1-sum(diag(tt))/sum(tt)
+```
+
+
+- May instead use the Principle components for constructing the tree for lower error rate (0.25)
+
+## Classification using forests
+
+- A natural extension to classification trees
+
+```{r}
+cvr <- rfcv(newko[,-1],newko[,1],step=0.9)
+cbind(nvars=cvr$n.var,error.rate=cvr$error.cv)
+```
+
+- choose 6 as sub-sample size
+
+```{r}
+fmod <- randomForest(species ~ ., newko, mtry=6)
+(tt <- table(actual=newko$species,predicted=predict(fmod)))
+1-sum(diag(tt))/sum(tt)
+```
+
+Use principal components on the predictors for rescue
+
+```{r}
+pck <- princomp(newko[,-1])
+pcdf <- data.frame(species = newko$species, pck$scores)
+fmod <- randomForest(species ~ ., pcdf, mtry=6)
+tt <- table(actual = newko$species, predicted=predict(fmod))
+1-sum(diag(tt))/sum(tt)
+```
+
+
+
+
+
+
+
+

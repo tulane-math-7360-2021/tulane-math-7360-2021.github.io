@@ -40,4 +40,5 @@ Topics:
 | **11/15** Count regression [[Rmd](../lectures/18-count_regression/count_regression.Rmd)][[HTML](../lectures/18-count_regression/count_regression.html)] | **11/17** GLM [[Rmd](../lectures/19-GLM/GLM.Rmd)][[HTML](../lectures/19-GLM/GLM.html)] | **11/19** Lab 10 GLM [[Rmd](../lectures/lab-10-GLM/lab_10_GLM.Rmd)][[HTML](../lectures/lab-10-GLM/lab_10_GLM.html)] | |
 | **11/22** Thanksgiving Holiday |  **11/24** Thanksgiving Holiday |  **11/26** Thanksgiving Holiday | |
 | **11/29** Neural Networks [[Rmd](../lectures/20-Neural_Network/neural_network.Rmd)][[HTML](../lectures/20-Neural_Network/neural_network.html)]| **12/01** Neural Networks (cont.) [[Rmd](../lectures/20-Neural_Network/neural_network_2.Rmd)][[HTML](../lectures/20-Neural_Network/neural_network_2.html)] | **12/03** Lab 11 Neural Network [[Rmd](../lectures/lab-11-Neural_Network/lab_11_neural_network.Rmd)][[HTML](../lectures/lab-11-Neural_Network/lab_11_neural_network.html)] | |
+| **12/06** Trees [[Rmd](../lectures/21-trees/trees.Rmd)][[HTML](../lectures/21-trees/trees.html)] | **12/08** Support Vector Machine [[Rmd](../lectures/22-svm/svm.Rmd)][[HTML](../lectures/22-svm/svm.html)] | | |
 

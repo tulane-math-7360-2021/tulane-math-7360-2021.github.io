@@ -1,0 +1,141 @@
+---
+title: "Support Vector Machines"
+author: "Dr. Xiang Ji @ Tulane University"
+date: "Dec 6, 2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: MATH-7360 Data Analysis
+csl: ../apa.csl
+---
+```{r setup, include=FALSE}
+rm(list = ls()) # clean-up workspace
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+[reference](http://uc-r.github.io/svm)
+
+We start with simulated toy data for illustration
+
+```{r}
+sessionInfo()
+set.seed(7360)
+
+# Attach Packages
+library(tidyverse)    # data manipulation and visualization
+library(kernlab)      # SVM methodology
+library(e1071)        # SVM methodology
+library(RColorBrewer) # customized coloring of plots
+
+# construct data set
+x <- matrix(rnorm(200*2), ncol = 2)
+x[1:100,] <- x[1:100,] + 2.5
+x[101:150,] <- x[101:150,] - 2.5
+y <- c(rep(1,150), rep(2,50))
+dat <- data.frame(x=x,y=as.factor(y))
+# plot data set
+ggplot(data = dat, aes(x = x.2, y = x.1, color = y, shape = y)) + 
+  geom_point(size = 2) +
+  scale_color_manual(values=c("#000000","#FF0000","#00BA00")) +
+  theme(legend.position = "none")
+```
+
+Use radial kernel for `svm` function from `e1071` package based on the shape of the data and plot results for SVM
+
+```{r}
+# sample training data and fit model
+train <- base::sample(200,100, replace = FALSE)
+svmfit <- svm(y~., data = dat[train,], kernel = "radial", gamma = 1, cost = 1)
+# plot classifier
+plot(svmfit, dat)
+```
+
+We can use `kernlab` package for the same procedure
+
+```{r}
+# Fit radial-based SVM in kernlab
+kernfit <- ksvm(x[train,],y[train], type = "C-svc", kernel = 'rbfdot', C = 1, scaled = c())
+# Plot training data
+plot(kernfit, data = x[train,])
+```
+
+Now tune the model to find optimal cost, gamma values
+
+```{r}
+# tune model to find optimal cost, gamma values
+tune.out <- tune(svm, y~., data = dat[train,], kernel = "radial",
+                 ranges = list(cost = c(0.1,1,10,100,1000),
+                 gamma = c(0.5,1,2,3,4)))
+# show best model
+tune.out$best.model
+```
+
+Now take a look at model performance
+
+```{r}
+# validate model performance
+(valid <- table(true = dat[-train,"y"], pred = predict(tune.out$best.model,
+                                             newx = dat[-train,])))
+sum(diag(valid)) / sum(valid)
+```
+
+
+[MNIST example reference](https://rstudio-pubs-static.s3.amazonaws.com/216042_fcd2c6c8ffa142e797ef8482a1ce0d56.html)
+
+### Prepare data
+
+Acquire data:
+```{r}
+library(keras)
+library(caret)
+library(e1071)
+library(kernlab)
+library(tidyverse)
+mnist <- dataset_mnist()
+x_train <- mnist$train$x
+y_train <- mnist$train$y
+
+x_train <- array_reshape(x_train, c(nrow(x_train), 28 * 28))
+selected.columns <- colSums(x_train) > 0
+x_train <- x_train[, selected.columns]
+
+x_test <- mnist$test$x
+y_test <- mnist$test$y
+
+training <- as_tibble(cbind(y_train, x_train))
+colnames(training) <- c("label", as.character(1: length(selected.columns)))
+
+training <- slice_sample(training, prop = 0.1)
+
+
+x_test <- array_reshape(x_test, c(nrow(x_test), 28 * 28))
+x_test <- x_test[, selected.columns]
+
+test <- as_tibble(cbind(y_test, x_test))
+colnames(test) <- c("label", as.character(1: length(selected.columns)))
+```
+
+fit svm
+
+```{r}
+model <- ksvm(label ~ ., data = training, type = "C-svc", kernel = "rbfdot", 
+    C = 100, gamma = 0.001, scaled = FALSE)
+```
+
+The post claimed a 0.99 accuracy using the full dataset.
+
+```{r}
+predicted <- predict(model, new = x_test)
+sum(predicted == y_test) / length(y_test)
+```
+
+We get 96% accuracy using only 10% of the training set, not bad at all.
+
+
+
+
+
+
+
+
