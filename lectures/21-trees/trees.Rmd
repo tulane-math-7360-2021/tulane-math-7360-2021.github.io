@@ -86,7 +86,7 @@ library(rpart)
 
 - The first split (nodes 2 and 3) is on temperature:  
 
-    - 215 observations have temperatures less than 67.5 with a mean response value of $7.4$.
+    - 214 observations have temperatures less than 67.5 with a mean response value of $7.4$.
     
     - 116 observations have temperatures greater than 67.5 with a mean response value of $20$.
 
@@ -203,7 +203,7 @@ predict(tmod,data.frame(t(x0)))
 - _Cost-complexity function_ for trees further narrow down the set of trees worth validating
 
     $$
-    CC(Tree) = \sum_{\mbox{terminal nodes: i}} RSS_i + \lambda(number of terminal nodes)
+    CC(Tree) = \sum_{\mbox{terminal nodes: i}} RSS_i + \lambda(\mbox{number of terminal nodes})
     $$
     
     - large $\lambda$ value favous small trees
